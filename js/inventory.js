@@ -233,7 +233,14 @@ async function saveProductModal(event) {
       alert(inventoryEditMode ? "Product updated successfully!" : "Product added successfully!");
       closeProductModal();
       invalidateCache("inventory");
-      await loadInventory();
+      if (window.productCreatedFromInvoice) {
+        window.productCreatedFromInvoice = false;
+        if (typeof fetchAutocompleteData === 'function') {
+          await fetchAutocompleteData();
+        }
+      } else {
+        await loadInventory();
+      }
     } else {
       alert(result.message || "Failed to save the product details.");
     }

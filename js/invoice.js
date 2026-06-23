@@ -210,6 +210,9 @@ async function fetchAutocompleteData() {
         customerDatabase.map(c => `<option value="${c.customerId}">${c.name} (${c.phone})</option>`).join("");
       makeSearchableSelect(sel, "— Select Customer —");
     }
+
+    // Refresh all product selects in the form
+    refreshProductSelects();
   } catch (err) {
     console.error("Autocomplete data error:", err);
   }
@@ -419,6 +422,16 @@ function calcRow(rid) {
   const qtyInput = tr.querySelector(".qty");
   let qty = parseFloat(qtyInput.value) || 0;
 
+  if (qty < 0) {
+    showToast("⚠️ Quantity cannot be negative.", "warn");
+    qtyInput.value = 0;
+    qty = 0;
+    if (card) {
+      const mQty = card.querySelector(".m-qty");
+      if (mQty) mQty.value = 0;
+    }
+  }
+
   if (opt && opt.value !== "") {
     if (stock <= 0 && qty > 0) {
       showToast(`⚠️ Out of stock! Cannot bill ${opt.text}.`, "error");
@@ -440,10 +453,77 @@ function calcRow(rid) {
     }
   }
 
-  const rate   = parseFloat(tr.querySelector(".rate").value) || 0;
-  const disc   = parseFloat(tr.querySelector(".disc").value) || 0;
-  const cgst   = parseFloat(tr.querySelector(".cgst").value) || 0;
-  const sgst   = parseFloat(tr.querySelector(".sgst").value) || 0;
+  const rateInput = tr.querySelector(".rate");
+  let rate = parseFloat(rateInput.value) || 0;
+  if (rate < 0) {
+    showToast("⚠️ Rate cannot be negative.", "warn");
+    rateInput.value = 0;
+    rate = 0;
+    if (card) {
+      const mRate = card.querySelector(".m-rate");
+      if (mRate) mRate.value = 0;
+    }
+  }
+
+  const discInput = tr.querySelector(".disc");
+  let disc = parseFloat(discInput.value) || 0;
+  if (disc < 0) {
+    showToast("⚠️ Discount cannot be negative.", "warn");
+    discInput.value = 0;
+    disc = 0;
+    if (card) {
+      const mDisc = card.querySelector(".m-disc");
+      if (mDisc) mDisc.value = 0;
+    }
+  } else if (disc > 100) {
+    showToast("⚠️ Max discount is 100%.", "warn");
+    discInput.value = 100;
+    disc = 100;
+    if (card) {
+      const mDisc = card.querySelector(".m-disc");
+      if (mDisc) mDisc.value = 100;
+    }
+  }
+
+  const cgstInput = tr.querySelector(".cgst");
+  let cgst = parseFloat(cgstInput.value) || 0;
+  if (cgst < 0) {
+    showToast("⚠️ CGST cannot be negative.", "warn");
+    cgstInput.value = 0;
+    cgst = 0;
+    if (card) {
+      const mCgst = card.querySelector(".m-cgst");
+      if (mCgst) mCgst.value = 0;
+    }
+  } else if (cgst > 100) {
+    showToast("⚠️ Max CGST is 100%.", "warn");
+    cgstInput.value = 100;
+    cgst = 100;
+    if (card) {
+      const mCgst = card.querySelector(".m-cgst");
+      if (mCgst) mCgst.value = 100;
+    }
+  }
+
+  const sgstInput = tr.querySelector(".sgst");
+  let sgst = parseFloat(sgstInput.value) || 0;
+  if (sgst < 0) {
+    showToast("⚠️ SGST cannot be negative.", "warn");
+    sgstInput.value = 0;
+    sgst = 0;
+    if (card) {
+      const mSgst = card.querySelector(".m-sgst");
+      if (mSgst) mSgst.value = 0;
+    }
+  } else if (sgst > 100) {
+    showToast("⚠️ Max SGST is 100%.", "warn");
+    sgstInput.value = 100;
+    sgst = 100;
+    if (card) {
+      const mSgst = card.querySelector(".m-sgst");
+      if (mSgst) mSgst.value = 100;
+    }
+  }
 
   const gross    = qty * rate;
   const discAmt  = gross * disc / 100;
@@ -1222,6 +1302,15 @@ function makeSearchableSelect(selectEl, placeholderText) {
             Add New Customer
           </button>
         `;
+      } else if (selectEl.classList.contains("inv-sel") || selectEl.classList.contains("m-sel")) {
+        noResultsDiv.style.cursor = 'default';
+        noResultsDiv.innerHTML = `
+          <div style="color: var(--slate-500); margin-bottom: 8px;">No matches found</div>
+          <button type="button" class="btn btn-primary btn-sm" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 13px;" onclick="openProductModalFromInvoice('${searchInput.value.trim().replace(/'/g, "\\'")}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add New Product
+          </button>
+        `;
       } else {
         noResultsDiv.textContent = 'No matches found';
       }
@@ -1352,6 +1441,32 @@ function openCustomerModalFromInvoice(name) {
     }
     window.customerCreatedFromInvoice = true;
   }
+}
+
+function openProductModalFromInvoice(name) {
+  if (typeof openProductModal === 'function') {
+    openProductModal();
+    const nameInput = document.getElementById("p_name");
+    if (nameInput) {
+      nameInput.value = name;
+    }
+    window.productCreatedFromInvoice = true;
+  }
+}
+
+function refreshProductSelects() {
+  const productOptions = inventoryProducts.map(p =>
+    `<option value="${p.productId}" data-rate="${p.rate}" data-unit="${p.unit||'Nos'}" data-cgst="${p.cgst||9}" data-sgst="${p.sgst||9}" data-stock="${p.stock}">${p.productName}</option>`
+  ).join("");
+
+  document.querySelectorAll(".inv-sel, .m-sel").forEach(sel => {
+    const currentValue = sel.value;
+    const isMobile = sel.classList.contains('m-sel');
+    const placeholder = isMobile ? '— Select Product —' : '— Select —';
+    sel.innerHTML = `<option value="">${placeholder}</option>` + productOptions;
+    sel.value = currentValue;
+    makeSearchableSelect(sel, placeholder);
+  });
 }
 
 
