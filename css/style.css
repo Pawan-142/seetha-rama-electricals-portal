@@ -930,7 +930,6 @@ main {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  animation: glassFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 @keyframes glassFadeIn {
   from { opacity: 0; }
