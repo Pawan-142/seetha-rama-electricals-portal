@@ -127,7 +127,7 @@ async function loadDashboard() {
         <div class="sre-chart-header">
           <h3 style="font-size: 18px; font-weight: 700; margin: 0;">Sales Performance</h3>
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <select id="salesFilter" class="sre-filter-select" onchange="handleSalesFilterChange(this.value)">
+            <select id="salesFilter" class="sre-filter-select" onchange="handleDashboardSalesFilterChange(this.value)">
               <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
               <option value="week" selected>Last 7 Days</option>
@@ -138,7 +138,7 @@ async function loadDashboard() {
               <input type="date" id="salesStartDate">
               <span style="font-size: 12px; color: var(--slate-400);">to</span>
               <input type="date" id="salesEndDate">
-              <button class="btn btn-primary sre-filter-btn" onclick="applySalesCustomFilter()">Apply</button>
+              <button class="btn btn-primary sre-filter-btn" onclick="applyDashboardSalesCustomFilter()">Apply</button>
             </div>
           </div>
         </div>
@@ -303,21 +303,21 @@ async function loadDashboard() {
 }
 
 // ==================== SALES CHART LOGIC ====================
-function handleSalesFilterChange(val) {
+function handleDashboardSalesFilterChange(val) {
   const datesContainer = document.getElementById("salesCustomDates");
   if (val === "custom") {
     datesContainer.style.display = "inline-flex";
     const todayStr = new Date().toISOString().split("T")[0];
     document.getElementById("salesStartDate").value = todayStr;
     document.getElementById("salesEndDate").value = todayStr;
-    applySalesCustomFilter();
+    applyDashboardSalesCustomFilter();
   } else {
     datesContainer.style.display = "none";
     updateSalesChart(val);
   }
 }
 
-function applySalesCustomFilter() {
+function applyDashboardSalesCustomFilter() {
   const start = document.getElementById("salesStartDate").value;
   const end = document.getElementById("salesEndDate").value;
   updateSalesChart("custom", start, end);
