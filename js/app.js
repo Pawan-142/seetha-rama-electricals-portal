@@ -3,23 +3,31 @@
 // ==========================================
 
 window.onload = () => {
-  const userStr = localStorage.getItem("user");
+  const userStr = localStorage.getItem("sre_user");
 
   if (userStr) {
-    document.getElementById("app").style.display = "flex";
-    document.getElementById("loginPage").style.display = "none";
-    
-    configureUIForRole();
-    
     try {
       const user = JSON.parse(userStr);
-      if (user.role === "staff") {
-        loadInvoice();
+      // Validate role to prevent local storage collision issues
+      if (user && (user.role === "staff" || user.role === "admin")) {
+        document.getElementById("app").style.display = "flex";
+        document.getElementById("loginPage").style.display = "none";
+        
+        configureUIForRole();
+        
+        if (user.role === "staff") {
+          loadInvoice();
+        } else {
+          loadDashboard();
+        }
       } else {
-        loadDashboard();
+        // Clear collision session
+        localStorage.removeItem("sre_user");
+        renderLogin();
       }
     } catch(e) {
-      loadDashboard();
+      localStorage.removeItem("sre_user");
+      renderLogin();
     }
   } else {
     // Force login screen

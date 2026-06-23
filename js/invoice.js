@@ -796,7 +796,7 @@ async function saveAndEmailInvoice() {
       amountWords:     numberToWords(grandTotal) + " Rupees Only",
       createdBy: (() => {
         try {
-          const u = JSON.parse(localStorage.getItem("user") || "{}");
+          const u = JSON.parse(localStorage.getItem("sre_user") || "{}");
           return u.name || u.username || "admin";
         } catch(e) { return "admin"; }
       })(),

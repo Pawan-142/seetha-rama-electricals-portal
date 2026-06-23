@@ -10,7 +10,7 @@ async function loadInventory() {
   setActiveNav("navInventory");
   showPage("inventory");
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(localStorage.getItem("sre_user") || "{}");
   const isStaff = user.role === 'staff';
 
   document.getElementById("inventory").innerHTML = `
@@ -73,7 +73,7 @@ function renderInventory(products) {
     return;
   }
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(localStorage.getItem("sre_user") || "{}");
   const isStaff = user.role === 'staff';
 
   let html = `

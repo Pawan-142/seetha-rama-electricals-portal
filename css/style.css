@@ -592,7 +592,7 @@ main {
 }
 
 /* ==========================================================================
-   LOGIN PAGE — SEETHA RAMA ELECTRICALS PREMIUM LOGIN
+   LOGIN PAGE — SEETHA RAMA ELECTRICALS GLASSMORPHIC DARK DESIGN
    ========================================================================== */
 
 /* ── Full Page Wrapper ── */
@@ -601,6 +601,7 @@ main {
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  background: #020617; /* Dark slate base */
 }
 
 /* ── Floating Particles ── */
@@ -608,68 +609,77 @@ main {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
   overflow: hidden;
 }
 .login-particle {
   position: absolute;
-  background: rgba(21,101,192,0.3);
+  background: rgba(59, 130, 246, 0.2);
   border-radius: 50%;
-  animation: sre-particleFloat 6s ease-in-out infinite;
+  animation: sre-particleFloat 8s ease-in-out infinite;
 }
 @keyframes sre-particleFloat {
-  0%,100% { opacity: 0; transform: translateY(0) scale(1); }
-  50%     { opacity: 0.7; transform: translateY(-45px) scale(1.4); }
+  0%, 100% { opacity: 0; transform: translateY(0) scale(1); }
+  50%     { opacity: 0.8; transform: translateY(-60px) scale(1.5); }
 }
 
-/* ==================== LEFT PANEL ==================== */
+/* ==================== LEFT PANEL (VISUAL SHOWCASE) ==================== */
 .login-left {
-  width: 56%;
+  width: 50%;
   min-width: 420px;
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 2;
-  background: linear-gradient(170deg, #0b1a40 0%, #0d2257 40%, #061226 100%);
+  background: linear-gradient(135deg, #090d1a 0%, #03050b 100%);
+  padding: 40px;
   overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Blue ambient light top-left */
+/* Atmospheric Ambient Glows */
 .login-left::before {
   content: '';
   position: absolute;
-  top: -100px; left: -60px;
-  width: 420px; height: 320px;
-  background: radial-gradient(ellipse, rgba(21,101,192,0.18) 0%, transparent 65%);
+  top: -150px; left: -100px;
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.login-left::after {
+  content: '';
+  position: absolute;
+  bottom: -150px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Left panel top content */
 .login-left-top {
-  padding: 30px 40px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
 }
 
-/* ── SR Logo ── */
+/* ── SR Logo Group ── */
 .sre-logo-group {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 2px;
+  gap: 16px;
 }
 .sre-logo-mark {
-  width: 52px; height: 52px;
-  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 50%, #1976d2 100%);
-  border-radius: 12px;
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #6366f1 100%);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 24px rgba(21,101,192,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
@@ -679,8 +689,8 @@ main {
   position: absolute;
   top: -50%; left: -50%;
   width: 200%; height: 200%;
-  background: conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.18) 10%, transparent 20%);
-  animation: sre-logoShine 4s linear infinite;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(255, 255, 255, 0.3) 10%, transparent 20%);
+  animation: sre-logoShine 6s linear infinite;
 }
 @keyframes sre-logoShine {
   to { transform: rotate(360deg); }
@@ -694,98 +704,120 @@ main {
 }
 .sre-logo-title-wrap { display: flex; flex-direction: column; gap: 2px; }
 .sre-logo-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: white;
-  letter-spacing: 1.5px;
-  line-height: 1.2;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  background: linear-gradient(to right, #ffffff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .sre-logo-subtitle {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
-  color: #f57c00;
-  letter-spacing: 3px;
+  color: #f97316; /* Electric Orange */
+  letter-spacing: 4px;
   text-transform: uppercase;
 }
 
-/* ── Category Tabs ── */
+/* ── Category Badge Pills ── */
 .sre-cat-tabs {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 10px;
   flex-wrap: wrap;
+  margin-top: 10px;
 }
 .sre-cat-tab {
   display: flex;
   align-items: center;
-  gap: 5px;
-  color: rgba(255,255,255,0.6);
-  font-size: 12.5px;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: color 0.25s;
-  padding: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 8px 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
 }
-.sre-cat-tab:hover { color: rgba(255,255,255,0.9); }
-.sre-cat-tab.sre-cat-active { color: white; font-weight: 600; }
-.sre-cat-tab svg { width: 13px; height: 13px; stroke-width: 2; flex-shrink: 0; }
-
-/* Separator pipe between tabs */
-.sre-cat-sep {
-  color: rgba(255,255,255,0.2);
-  font-size: 14px;
-  line-height: 1;
-  margin: 0 10px;
-  user-select: none;
+.sre-cat-tab:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.sre-cat-tab.active, .sre-cat-tab.sre-cat-active {
+  color: white;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(79, 70, 229, 0.2) 100%);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+.sre-cat-tab svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
 }
 
-/* ── Product Showcase Image ── */
+/* ── Product Showcase ── */
 .sre-showcase {
   flex: 1;
   position: relative;
+  border-radius: 20px;
   overflow: hidden;
-  min-height: 280px;
+  min-height: 300px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 .sre-showcase-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center;
   display: block;
-  transform: scale(1.05);
-  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform;
+  transform: scale(1.02);
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.sre-showcase-img:hover {
+  transform: scale(1.06);
 }
 .sre-showcase-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(11,26,64,0.72) 0%,
-    transparent 30%,
-    transparent 62%,
-    rgba(4,9,28,0.88) 100%
+    rgba(9, 13, 26, 0.4) 0%,
+    transparent 40%,
+    transparent 70%,
+    rgba(3, 5, 11, 0.85) 100%
   );
   pointer-events: none;
   z-index: 1;
 }
-.sre-showcase-glow {
+
+/* Interactive Floating Glows */
+.sre-glow {
   position: absolute;
   pointer-events: none;
   z-index: 2;
 }
 .sre-glow-top {
-  top: -20px; right: 12%;
-  width: 220px; height: 130px;
-  background: radial-gradient(ellipse, rgba(21,101,192,0.22) 0%, transparent 70%);
-  filter: blur(20px);
+  top: -40px; right: 8%;
+  width: 240px; height: 140px;
+  background: radial-gradient(ellipse, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+  filter: blur(25px);
   animation: sre-glowPulse 4s ease-in-out infinite;
 }
 .sre-glow-bottom {
-  bottom: 50px; left: 15%;
-  width: 260px; height: 110px;
-  background: radial-gradient(ellipse, rgba(245,124,0,0.08) 0%, transparent 70%);
-  filter: blur(22px);
+  bottom: 80px; left: 10%;
+  width: 280px; height: 120px;
+  background: radial-gradient(ellipse, rgba(249, 115, 22, 0.12) 0%, transparent 70%);
+  filter: blur(25px);
   animation: sre-glowPulse 5s ease-in-out infinite 1.5s;
 }
 @keyframes sre-glowPulse {
@@ -793,232 +825,264 @@ main {
   50% { opacity: 1; transform: scale(1.15); }
 }
 
-/* ── Bottom Feature Badges (overlaid on image) ── */
+/* ── Bottom Feature Row strip ── */
 .sre-features-row {
   position: absolute;
   bottom: 0; left: 0; right: 0;
   z-index: 3;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: rgba(4,9,28,0.80);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(255,255,255,0.07);
-  padding: 14px 20px;
-  gap: 0;
+  background: rgba(3, 5, 11, 0.85);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 18px 24px;
 }
 .sre-feature {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   text-align: center;
-  padding: 4px 6px;
-  border-right: 1px solid rgba(255,255,255,0.06);
+  padding: 4px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 .sre-feature:last-child { border-right: none; }
 .sre-feature-icon {
-  width: 30px; height: 30px;
-  background: rgba(21,101,192,0.15);
-  border: 1px solid rgba(21,101,192,0.25);
-  border-radius: 7px;
+  width: 32px; height: 32px;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #42a5f5;
-  flex-shrink: 0;
-  transition: all 0.3s;
+  color: #60a5fa;
   margin-bottom: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .sre-feature:hover .sre-feature-icon {
-  background: rgba(21,101,192,0.28);
-  transform: scale(1.1);
+  background: rgba(59, 130, 246, 0.25);
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+.sre-feature-icon svg {
+  width: 16px; height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
 }
 .sre-feature strong {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  color: rgba(255,255,255,0.85);
-  display: block;
-  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.2;
 }
 .sre-feature small {
-  font-size: 8.5px;
-  color: rgba(255,255,255,0.38);
-  display: block;
-  line-height: 1.3;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
 }
 
-/* ==================== RIGHT PANEL ==================== */
+/* ==================== RIGHT PANEL (GLASSMORPHIC FORM) ==================== */
 .login-right {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 28px 36px;
+  padding: 40px;
   position: relative;
   z-index: 2;
-  background: #eef2f9;
+  background: linear-gradient(135deg, #070b14 0%, #030509 100%);
   overflow-y: auto;
-  gap: 0;
 }
 
-/* Decorative blue circle top-right */
+/* Glowing background ambient filters */
 .login-right::before {
   content: '';
   position: absolute;
-  top: -130px; right: -130px;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(21,101,192,0.10) 0%, transparent 65%);
+  top: -150px; right: -150px;
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 65%);
   border-radius: 50%;
   pointer-events: none;
 }
 .login-right::after {
   content: '';
   position: absolute;
-  bottom: -80px; left: -60px;
-  width: 280px; height: 280px;
-  background: radial-gradient(circle, rgba(245,124,0,0.07) 0%, transparent 65%);
+  bottom: -100px; left: -100px;
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.06) 0%, transparent 65%);
   border-radius: 50%;
   pointer-events: none;
 }
 
-/* ── Login Card (white floating card) ── */
+/* ── Frosted Glass Login Card ── */
 .sre-login-card {
-  background: white;
-  border-radius: 20px;
-  padding: 36px 32px 28px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.05);
-  border: 1px solid rgba(226,232,240,0.9);
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  animation: glassFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes glassFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Card Logo Icon ── */
+/* ── Card Logo ── */
 .sre-card-logo {
-  width: 66px; height: 66px;
-  background: #f0f6ff;
+  width: 68px; height: 68px;
+  background: rgba(59, 130, 246, 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 18px;
-  border: 2px solid #dbeafe;
-  box-shadow: 0 0 0 6px rgba(219,234,254,0.35);
+  margin: 0 auto 20px;
+  border: 2px solid rgba(59, 130, 246, 0.25);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
 }
-.sre-card-logo svg { color: #1565c0; }
+.sre-card-logo svg {
+  color: #3b82f6;
+}
 
-/* ── Card Heading ── */
+/* ── Welcome Typography ── */
 .sre-card-title {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
-  color: #0f172a;
+  color: white;
   text-align: center;
-  margin-bottom: 4px;
-  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
 }
 .sre-card-sub {
-  font-size: 13px;
-  color: #64748b;
+  font-size: 14px;
+  color: var(--slate-400);
   text-align: center;
-  margin-bottom: 26px;
+  margin-bottom: 30px;
 }
 
-/* ── Input Labels ── */
+/* ── Label Styling ── */
 .sre-field-label {
   display: block;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #334155;
-  margin-bottom: 6px;
+  color: var(--slate-300);
+  margin-bottom: 8px;
 }
 
-/* ── Input Wraps ── */
+/* ── Input Wrapper ── */
 .sre-input-wrap {
   position: relative;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 .sre-input-icon {
   position: absolute;
-  left: 13px; top: 50%;
+  left: 14px; top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--slate-500);
   display: flex;
   align-items: center;
   z-index: 2;
-  transition: color 0.25s;
+  transition: color 0.2s ease;
+}
+.sre-input-icon svg {
+  width: 18px; height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
 }
 .sre-input-wrap:focus-within .sre-input-icon {
-  color: #1565c0;
+  color: #3b82f6;
 }
+
+/* ── Styled Dark Input ── */
 .sre-input {
   width: 100%;
-  padding: 13px 14px 13px 42px;
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  color: #0f172a;
-  font-size: 14px;
+  padding: 14px 16px 14px 44px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: white;
+  font-size: 14.5px;
   font-family: 'Outfit', sans-serif;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
 }
 .sre-input:focus {
-  background: white;
-  border-color: #1565c0;
-  box-shadow: 0 0 0 3px rgba(21,101,192,0.12);
+  background: rgba(15, 23, 42, 0.85);
+  border-color: #3b82f6;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
 }
-.sre-input::placeholder { color: #94a3b8; }
+.sre-input::placeholder {
+  color: var(--slate-500);
+}
+
+/* Password Eye button */
 .sre-eye-btn {
   position: absolute;
-  right: 12px; top: 50%;
+  right: 14px; top: 50%;
   transform: translateY(-50%);
   background: none; border: none;
   cursor: pointer;
-  color: #94a3b8;
+  color: var(--slate-500);
   display: flex; align-items: center;
   padding: 4px;
-  transition: color 0.2s;
+  transition: color 0.2s ease;
   z-index: 2;
 }
-.sre-eye-btn:hover { color: #1565c0; }
+.sre-eye-btn:hover {
+  color: #3b82f6;
+}
+.sre-eye-btn svg {
+  width: 18px; height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
 
-/* ── Form Options Row ── */
+/* ── Options (Remember + Forgot) ── */
 .sre-form-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .sre-checkbox {
   display: flex;
   align-items: center;
-  color: #475569;
+  color: var(--slate-300);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 13.5px;
   position: relative;
-  padding-left: 22px;
+  padding-left: 24px;
   user-select: none;
 }
 .sre-checkbox input {
   position: absolute;
-  opacity: 0;
-  cursor: pointer;
+  opacity: 0; cursor: pointer;
   width: 0; height: 0;
 }
 .sre-checkmark {
   position: absolute;
   left: 0; top: 50%;
   transform: translateY(-50%);
-  width: 15px; height: 15px;
-  background: white;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 3px;
-  transition: all 0.2s;
+  width: 16px; height: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 .sre-checkbox input:checked ~ .sre-checkmark {
-  background: #1565c0;
-  border-color: #1565c0;
+  background: #3b82f6;
+  border-color: #3b82f6;
 }
 .sre-checkbox input:checked ~ .sre-checkmark::after {
   content: '✓';
@@ -1026,29 +1090,28 @@ main {
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
 }
 .sre-forgot {
-  color: #1565c0;
+  color: #60a5fa;
   text-decoration: none;
   font-weight: 600;
-  font-size: 13px;
-  transition: all 0.2s;
+  font-size: 13.5px;
+  transition: color 0.2s ease;
 }
 .sre-forgot:hover {
-  color: #0d47a1;
+  color: #93c5fd;
   text-decoration: underline;
 }
 
-/* ── Sign In Button ── */
+/* ── Action Button ── */
 .sre-signin-btn {
   width: 100%;
-  padding: 14px 24px;
-  background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #1e88e5 100%);
-  background-size: 200% auto;
+  padding: 15px 24px;
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   color: white;
   font-size: 15px;
   font-weight: 700;
@@ -1058,391 +1121,30 @@ main {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 18px rgba(21,101,192,0.38);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35);
   position: relative;
   overflow: hidden;
-  margin-bottom: 16px;
-  letter-spacing: 0.3px;
+  margin-bottom: 18px;
+  letter-spacing: 0.5px;
 }
 .sre-signin-btn::before {
   content: '';
   position: absolute;
   top: 0; left: -100%;
   width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
-  transition: left 0.5s ease;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transition: left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .sre-signin-btn:hover {
-  background-position: right center;
-  box-shadow: 0 6px 28px rgba(21,101,192,0.5);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
   transform: translateY(-2px);
 }
-.sre-signin-btn:hover::before { left: 100%; }
-.sre-signin-btn:active { transform: translateY(0); }
-.sre-btn-arrow {
-  font-size: 18px;
-  transition: transform 0.3s;
+.sre-signin-btn:hover::before {
+  left: 100%;
 }
 .sre-signin-btn:hover .sre-btn-arrow {
-  transform: translateX(5px);
-}
-
-  font-size: 11.5px;
-  font-weight: 500;
-  margin-top: 14px;
-}
-
-/* ── Features Row ── */
-.sre-features-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-top: auto;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255,255,255,0.04);
-  margin-bottom: 14px;
-}
-.sre-feature {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.sre-feature-icon {
-  width: 30px; height: 30px;
-  background: rgba(201,150,60,0.08);
-  border: 1px solid rgba(201,150,60,0.15);
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: #c9963c;
-  flex-shrink: 0;
-  transition: all 0.3s;
-}
-.sre-feature:hover .sre-feature-icon {
-  background: rgba(201,150,60,0.15);
-  transform: scale(1.1);
-}
-.sre-feature strong {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.65);
-  display: block;
-  line-height: 1.2;
-}
-.sre-feature small {
-  font-size: 9.5px;
-  color: rgba(255,255,255,0.25);
-}
-
-/* ── Copyright ── */
-.sre-copyright {
-  font-size: 10.5px;
-  color: rgba(255,255,255,0.18);
-}
-
-/* ==================== RIGHT PANEL ==================== */
-.login-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 28px 36px;
-  position: relative;
-  z-index: 2;
-  background: linear-gradient(160deg, rgba(15,22,40,0.4) 0%, rgba(6,11,24,0.7) 100%);
-  overflow: hidden;
-}
-/* Warm ambient light */
-.login-right::before {
-  content: '';
-  position: absolute;
-  top: -80px; right: -40px;
-  width: 400px; height: 300px;
-  background: radial-gradient(ellipse, rgba(201,150,60,0.1) 0%, transparent 65%);
-  pointer-events: none;
-}
-
-/* ── Authorized Dealer Header ── */
-.sre-dealer-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
-}
-.sre-dealer-line {
-  flex: 1; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,150,60,0.35), transparent);
-}
-.sre-dealer-text {
-  font-size: 11px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.55);
-  letter-spacing: 2.5px;
-  white-space: nowrap;
-}
-
-/* ── Brand Grid ── */
-.sre-brands-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 20px;
-}
-.sre-brand {
-  background: rgba(255,255,255,0.93);
-  border-radius: 8px;
-  padding: 10px 6px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: #1e293b;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  cursor: default;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  letter-spacing: 0.5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  min-height: 44px;
-}
-.sre-brand small {
-  font-size: 7.5px;
-  font-weight: 500;
-  color: #64748b;
-  letter-spacing: 0.3px;
-  line-height: 1.2;
-}
-.sre-brand .sre-brand-name {
-  line-height: 1.2;
-}
-.sre-brand:hover {
-  transform: translateY(-4px) scale(1.06);
-  box-shadow: 0 10px 30px rgba(201,150,60,0.2);
-  background: white;
-}
-.sre-brand-highlight {
-  transform: translateY(-3px) scale(1.04) !important;
-  box-shadow: 0 8px 25px rgba(201,150,60,0.25) !important;
-  border-color: rgba(201,150,60,0.3) !important;
-  background: white !important;
-}
-
-/* Individual brand colors */
-.sre-brand-polycab .sre-brand-name { color: #e63946; font-weight: 800; }
-.sre-brand-finolex .sre-brand-name { color: #d32f2f; }
-.sre-brand-havells .sre-brand-name { color: #1565c0; }
-.sre-brand-legrand .sre-brand-name { color: #e65100; font-style: italic; }
-.sre-brand-lt .sre-brand-name { color: #0d47a1; font-size: 9px; }
-.sre-brand-lt small { font-size: 7px; color: #0d47a1; font-weight: 600; }
-.sre-brand-crompton .sre-brand-name { color: #2e7d32; }
-.sre-brand-philips .sre-brand-name { color: #1a237e; letter-spacing: 1.5px; }
-.sre-brand-orient .sre-brand-name { color: #f57f17; }
-.sre-brand-orient small { color: #f57f17; }
-.sre-brand-astral .sre-brand-name { color: #1565c0; }
-.sre-brand-astral small { color: #1565c0; font-weight: 600; }
-.sre-brand-supreme .sre-brand-name { color: #4a148c; font-style: italic; }
-.sre-brand-jaquar .sre-brand-name { color: #b8860b; font-style: italic; }
-.sre-brand-hindware .sre-brand-name { color: #37474f; }
-
-/* ── Product Showcase Image Area ── */
-.sre-showcase {
-  flex: 1;
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  min-height: 280px;
-  background: linear-gradient(160deg, #0a1628 0%, #0d1b2e 100%);
-}
-.sre-showcase-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  transform: scale(1.05);
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform;
-}
-.sre-showcase-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(6,11,24,0.15) 0%,
-    transparent 30%,
-    transparent 60%,
-    rgba(6,11,24,0.4) 100%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-.sre-showcase-glow {
-  position: absolute;
-  pointer-events: none;
-  z-index: 2;
-}
-.sre-glow-top {
-  top: -30px;
-  right: 10%;
-  width: 200px;
-  height: 120px;
-  background: radial-gradient(ellipse, rgba(201,150,60,0.2) 0%, transparent 70%);
-  filter: blur(20px);
-  animation: sre-glowPulse 4s ease-in-out infinite;
-}
-.sre-glow-bottom {
-  bottom: -20px;
-  left: 20%;
-  width: 250px;
-  height: 100px;
-  background: radial-gradient(ellipse, rgba(37,99,235,0.12) 0%, transparent 70%);
-  filter: blur(25px);
-  animation: sre-glowPulse 5s ease-in-out infinite 1.5s;
-}
-@keyframes sre-glowPulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-/* ── Category Tab Active State ── */
-.sre-cat-tab.sre-cat-active {
-  background: rgba(201,150,60,0.12);
-  color: #e8c36a;
-}
-.sre-cat-tab.sre-cat-active::after {
-  opacity: 1;
-}
-
-/* ── Ripple Effect ── */
-.sre-ripple {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle, rgba(201,150,60,0.2) 0%, transparent 70%);
-  border-radius: inherit;
-  animation: sre-rippleAnim 0.6s ease-out forwards;
-  pointer-events: none;
-}
-@keyframes sre-rippleAnim {
-  0% { opacity: 1; transform: scale(0.5); }
-  100% { opacity: 0; transform: scale(1.5); }
-}
-
-/* ── Form Focused State ── */
-.sre-form-card.sre-form-focused {
-  border-color: rgba(201,150,60,0.2);
-  box-shadow: 0 0 30px rgba(201,150,60,0.06);
-}
-
-/* ── Input Filled State ── */
-.sre-input.sre-input-filled {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(201,150,60,0.2);
-}
-
-/* ── Button Pressed State ── */
-.sre-signin-btn.sre-btn-pressed {
-  transform: scale(0.97);
-  box-shadow: 0 2px 10px rgba(201,150,60,0.2);
-}
-
-/* ── Bottom Info Strip ── */
-.sre-info-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255,255,255,0.04);
-  margin-top: 18px;
-}
-.sre-info-item {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 10px 12px;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.04);
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  cursor: default;
-}
-.sre-info-item:hover {
-  background: rgba(255,255,255,0.055);
-  border-color: rgba(201,150,60,0.18);
-  transform: translateY(-2px);
-}
-.sre-info-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-  color: #c9963c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: rgba(201,150,60,0.08);
-  border: 1px solid rgba(201,150,60,0.12);
-  border-radius: 8px;
-}
-.sre-info-icon svg {
-  stroke: #c9963c;
-}
-.sre-info-item strong {
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.75);
-  display: block;
-  line-height: 1.3;
-}
-.sre-info-item small {
-  font-size: 9.5px;
-  color: rgba(255,255,255,0.3);
-  display: block;
-  line-height: 1.3;
-}
-
-/* ==================== LOGIN RESPONSIVE ==================== */
-@media (max-width: 1200px) {
-  .sre-brands-grid { grid-template-columns: repeat(3, 1fr); }
-  .sre-info-strip { grid-template-columns: repeat(2, 1fr); }
-  .sre-features-row { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 991px) {
-  .login-wrapper { flex-direction: column; }
-  .login-left {
-    width: 100%;
-    min-width: unset;
-    padding: 28px 24px;
-    border-right: none;
-    border-bottom: 1px solid rgba(201,150,60,0.1);
-  }
-  .login-right { padding: 24px; }
-  .sre-showcase { min-height: 220px; }
-  .sre-brands-grid { grid-template-columns: repeat(4, 1fr); }
-  .sre-info-strip { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 600px) {
-  .login-left { padding: 20px 16px; }
-  .sre-logo-group { gap: 12px; margin-bottom: 20px; }
-  .sre-logo-mark { width: 48px; height: 48px; border-radius: 10px; }
-  .sre-logo-s, .sre-logo-r { font-size: 19px; }
-  .sre-logo-title { font-size: 17px; letter-spacing: 1.5px; }
-  .sre-logo-subtitle { font-size: 13px; letter-spacing: 3px; }
-  .sre-cat-tabs { flex-wrap: wrap; border-radius: 10px; }
-  .sre-cat-tab { flex: 1 1 22%; padding: 10px 4px; font-size: 8px; }
-  .sre-cat-tab svg { width: 18px; height: 18px; }
-  .sre-tagline h1 { font-size: 19px; }
-  .sre-form-card { padding: 18px; }
-  .sre-brands-grid { grid-template-columns: repeat(3, 1fr); }
-  .sre-showcase { min-height: 160px; }
-  .sre-info-strip { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .sre-features-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  transform: translateX(6px);
 }
 
 /* ==========================================================================

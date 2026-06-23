@@ -69,7 +69,7 @@ function renderUsers(users) {
   // Get current logged-in user to prevent self-deletion
   let currentUsername = "";
   try {
-    const u = JSON.parse(localStorage.getItem("user") || "{}");
+    const u = JSON.parse(localStorage.getItem("sre_user") || "{}");
     currentUsername = (u.username || "").toLowerCase();
   } catch (e) {}
 

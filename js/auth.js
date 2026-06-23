@@ -29,23 +29,20 @@ function renderLogin() {
             </div>
           </div>
 
-          <!-- Category Tabs -->
+          <!-- Category Tabs (Styled as glowing pills with no hard pipe separators) -->
           <div class="sre-cat-tabs">
             <div class="sre-cat-tab sre-cat-active" id="catElectrical">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               <span>Electrical</span>
             </div>
-            <span class="sre-cat-sep">|</span>
             <div class="sre-cat-tab" id="catPlumbing">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 20V10m0 0c0-4 3-7 6-7s6 3 6 7m-12 0h12m0 0v10M10 14v2m4-2v2"/></svg>
               <span>Plumbing</span>
             </div>
-            <span class="sre-cat-sep">|</span>
             <div class="sre-cat-tab" id="catHardware">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
               <span>Hardware</span>
             </div>
-            <span class="sre-cat-sep">|</span>
             <div class="sre-cat-tab" id="catLighting">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
               <span>Lighting</span>
@@ -59,8 +56,8 @@ function renderLogin() {
                alt="Electrical, Plumbing &amp; Hardware Products"
                class="sre-showcase-img" id="showcaseImg">
           <div class="sre-showcase-overlay"></div>
-          <div class="sre-showcase-glow sre-glow-top"></div>
-          <div class="sre-showcase-glow sre-glow-bottom"></div>
+          <div class="sre-glow sre-glow-top"></div>
+          <div class="sre-glow sre-glow-bottom"></div>
 
           <!-- Feature badges overlaid at bottom of image -->
           <div class="sre-features-row">
@@ -98,15 +95,15 @@ function renderLogin() {
 
       <!-- ==================== RIGHT PANEL ==================== -->
       <div class="login-right" id="loginRight">
-        <!-- White Login Card -->
+        <!-- Frosted Glass Login Card -->
         <div class="sre-login-card" id="loginFormCard">
           <!-- House + Lightning Icon -->
           <div class="sre-card-logo">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="1.8"
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
               <polyline points="9 22 9 12 15 12 15 22"/>
-              <path d="M12 8l-2 4h4l-2 4" stroke="#f57c00" stroke-width="1.6" fill="rgba(245,124,0,0.12)"/>
+              <path d="M12 8l-2 4h4l-2 4" stroke="#f97316" stroke-width="1.6" fill="rgba(249,115,22,0.12)"/>
             </svg>
           </div>
 
@@ -147,7 +144,7 @@ function renderLogin() {
             <!-- Remember Me + Forgot -->
             <div class="sre-form-row">
               <label class="sre-checkbox">
-                <input type="checkbox" checked>
+                <input type="checkbox" id="rememberMe" checked>
                 <span class="sre-checkmark"></span>
                 Remember me
               </label>
@@ -180,10 +177,8 @@ function renderLogin() {
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
               </span>
-              <div>
-                <strong>Secured Data</strong>
-                <small>Your data is safe with us</small>
-              </div>
+              <strong>Secured Data</strong>
+              <small>Data is safe</small>
             </div>
             <div class="sre-info-item">
               <span class="sre-info-icon">
@@ -194,10 +189,8 @@ function renderLogin() {
                   <line x1="16" y1="17" x2="8" y2="17"/>
                 </svg>
               </span>
-              <div>
-                <strong>GST Billing</strong>
-                <small>Accurate invoices with GST</small>
-              </div>
+              <strong>GST Billing</strong>
+              <small>Accurate GST</small>
             </div>
             <div class="sre-info-item">
               <span class="sre-info-icon">
@@ -206,10 +199,8 @@ function renderLogin() {
                   <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
                 </svg>
               </span>
-              <div>
-                <strong>Easy Returns</strong>
-                <small>Hassle-free return policy</small>
-              </div>
+              <strong>Easy Returns</strong>
+              <small>Hassle-free</small>
             </div>
           </div>
 
@@ -352,7 +343,7 @@ async function handleLoginSubmit(event) {
     const result = await response.json();
 
     if (result.success) {
-      localStorage.setItem("user", JSON.stringify(result.user));
+      localStorage.setItem("sre_user", JSON.stringify(result.user));
       
       document.getElementById("loginPage").style.display = "none";
       document.getElementById("app").style.display = "flex";
@@ -378,12 +369,12 @@ async function handleLoginSubmit(event) {
 }
 
 function logout() {
-  localStorage.removeItem("user");
+  localStorage.removeItem("sre_user");
   location.reload();
 }
 
 function configureUIForRole() {
-  const userStr = localStorage.getItem("user");
+  const userStr = localStorage.getItem("sre_user");
   if (!userStr) return;
   
   try {
@@ -454,7 +445,7 @@ async function saveChangePasswordModal(event) {
   
   let username = "";
   try {
-    username = JSON.parse(localStorage.getItem("user") || "{}").username;
+    username = JSON.parse(localStorage.getItem("sre_user") || "{}").username;
   } catch(e) {}
   
   try {
