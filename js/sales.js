@@ -120,11 +120,7 @@ async function loadSales() {
 
 async function fetchSalesHistory() {
   try {
-    const response = await fetch(API_URL + "?action=sales");
-    const result = await response.json();
-    
-    // Support direct array or wrapped data key
-    const sales = Array.isArray(result) ? result : (result.data || []);
+    const sales = await getCachedData("sales");
     
     allSalesRaw = sales;
     

@@ -197,15 +197,12 @@ async function loadInvoice() {
 ------------------------------------------- */
 async function fetchAutocompleteData() {
   try {
-    const [invRes, custRes] = await Promise.all([
-      fetch(API_URL + "?action=inventory"),
-      fetch(API_URL + "?action=customers")
+    const [invData, custData] = await Promise.all([
+      getCachedData("inventory"),
+      getCachedData("customers")
     ]);
-    const invData  = await invRes.json();
-    inventoryProducts = Array.isArray(invData) ? invData : (invData.data || []);
-
-    const custData = await custRes.json();
-    customerDatabase  = Array.isArray(custData) ? custData : (custData.data || []);
+    inventoryProducts = invData;
+    customerDatabase  = custData;
 
     const sel = document.getElementById("customerSelect");
     if (sel) {
@@ -415,7 +412,34 @@ function calcRow(rid) {
   const card = document.getElementById("mc-" + rid);
   if (!tr) return;
 
-  const qty    = parseFloat(tr.querySelector(".qty").value)  || 0;
+  const sel = tr.querySelector(".inv-sel");
+  const opt = sel ? sel.options[sel.selectedIndex] : null;
+  const stock = (opt && opt.value !== "") ? parseFloat(opt.dataset.stock) || 0 : 999999;
+
+  const qtyInput = tr.querySelector(".qty");
+  let qty = parseFloat(qtyInput.value) || 0;
+
+  if (opt && opt.value !== "") {
+    if (stock <= 0 && qty > 0) {
+      showToast(`⚠️ Out of stock! Cannot bill ${opt.text}.`, "error");
+      qtyInput.value = 0;
+      qty = 0;
+      if (card) {
+        const mQty = card.querySelector(".m-qty");
+        if (mQty) mQty.value = 0;
+      }
+    } else if (qty > stock) {
+      const capped = Math.max(0, stock);
+      showToast(`⚠️ Insufficient stock for ${opt.text}! Available: ${stock}`, "error");
+      qtyInput.value = capped;
+      qty = capped;
+      if (card) {
+        const mQty = card.querySelector(".m-qty");
+        if (mQty) mQty.value = capped;
+      }
+    }
+  }
+
   const rate   = parseFloat(tr.querySelector(".rate").value) || 0;
   const disc   = parseFloat(tr.querySelector(".disc").value) || 0;
   const cgst   = parseFloat(tr.querySelector(".cgst").value) || 0;
@@ -747,6 +771,26 @@ async function saveAndEmailInvoice() {
     showToast("All item quantities must be greater than 0.", "warn"); return;
   }
 
+  // Check stock for all items as a final safeguard
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const rows = document.querySelectorAll("#invDesktopBody tr");
+    let matchedStock = 999999;
+    for (let r of rows) {
+      const sel = r.querySelector(".inv-sel");
+      if (sel && sel.value === item.productId) {
+        const opt = sel.options[sel.selectedIndex];
+        matchedStock = parseFloat(opt.dataset.stock) || 0;
+        break;
+      }
+    }
+    
+    if (item.qty > matchedStock) {
+      showToast(`⚠️ Cannot save invoice. ${item.productName} has insufficient stock (Available: ${matchedStock}, Billed: ${item.qty}).`, "error");
+      return;
+    }
+  }
+
   const btn = document.getElementById("saveInvoiceBtn");
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> Saving…`;
@@ -835,6 +879,10 @@ async function saveAndEmailInvoice() {
       showToast(result.message || "Failed to save invoice.", "error");
       return;
     }
+
+    // Invalidate caches since invoice creation updates sales registry and reduces inventory stock levels
+    invalidateCache("sales");
+    invalidateCache("inventory");
 
     // ── Step 2: Show print dialog for local PDF ──────────────────
     printInvoiceAsPDF(invNo);

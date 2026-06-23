@@ -40,10 +40,7 @@ async function loadCustomers() {
 
 async function fetchCustomers() {
   try {
-    const response = await fetch(API_URL + "?action=customers");
-    const result = await response.json();
-    
-    const customers = Array.isArray(result) ? result : (result.data || []);
+    const customers = await getCachedData("customers");
     allCustomers = customers; // Store globally for editing prefill
     
     renderCustomers(customers);
@@ -194,6 +191,7 @@ async function saveCustomerModal(event) {
     if (result.success) {
       alert(customerEditMode ? "Customer details updated successfully!" : "Customer added successfully to database!");
       closeCustomerModal();
+      invalidateCache("customers");
       if (window.customerCreatedFromInvoice) {
         window.customerCreatedFromInvoice = false;
         if (typeof fetchAutocompleteData === 'function') {
@@ -243,6 +241,7 @@ async function deleteCustomer(customerId) {
 
     if (result.success) {
       alert("Customer deleted successfully!");
+      invalidateCache("customers");
       await loadCustomers();
     } else {
       alert(result.message || "Failed to delete the customer.");

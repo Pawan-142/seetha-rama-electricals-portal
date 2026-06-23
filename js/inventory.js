@@ -45,11 +45,7 @@ async function loadInventory() {
 
 async function fetchInventory() {
   try {
-    const response = await fetch(API_URL + "?action=inventory");
-    const result = await response.json();
-    
-    // Support formats: direct array or wrapped data key
-    const products = Array.isArray(result) ? result : (result.data || []);
+    const products = await getCachedData("inventory");
     allProducts = products; // Store globally for editing prefill
     
     renderInventory(products);
@@ -236,6 +232,7 @@ async function saveProductModal(event) {
     if (result.success) {
       alert(inventoryEditMode ? "Product updated successfully!" : "Product added successfully!");
       closeProductModal();
+      invalidateCache("inventory");
       await loadInventory();
     } else {
       alert(result.message || "Failed to save the product details.");
@@ -267,6 +264,7 @@ async function deleteProduct(productId) {
 
     if (result.success) {
       alert("Product deleted successfully!");
+      invalidateCache("inventory");
       await loadInventory();
     } else {
       alert(result.message || "Failed to delete the product.");

@@ -233,15 +233,15 @@ async function loadDashboard() {
   `;
 
   try {
-    // Concurrently fetch general stats, raw sales list, and raw inventory list
+    // Concurrently get general stats, raw sales list, and raw inventory list via cache layer
     const [statsRes, salesRes, invRes] = await Promise.all([
-      fetch(API_URL + "?action=dashboard").then(r => r.json()),
-      fetch(API_URL + "?action=sales").then(r => r.json()),
-      fetch(API_URL + "?action=inventory").then(r => r.json())
+      getCachedData("dashboard"),
+      getCachedData("sales"),
+      getCachedData("inventory")
     ]);
 
-    dashboardSalesRaw = Array.isArray(salesRes) ? salesRes : (salesRes.data || []);
-    const productsRaw = Array.isArray(invRes) ? invRes : (invRes.data || []);
+    dashboardSalesRaw = salesRes;
+    const productsRaw = invRes;
 
     // Build Product Category lookup map
     productCategoryMap = {};

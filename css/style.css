@@ -1212,15 +1212,14 @@ main {
 
 /* ── Desktop Table ── */
 .inv-table-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
   margin-bottom: 16px;
 }
 .inv-table {
-  width: 100%; min-width: 860px;
+  width: 100%;
   border-collapse: collapse;
   font-size: 13.5px;
 }

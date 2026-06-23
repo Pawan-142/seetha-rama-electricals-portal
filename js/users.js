@@ -40,10 +40,7 @@ async function loadUsers() {
 
 async function fetchUsers() {
   try {
-    const response = await fetch(API_URL + "?action=users");
-    const result = await response.json();
-    
-    const users = Array.isArray(result) ? result : (result.data || []);
+    const users = await getCachedData("users");
     allUsers = users;
     renderUsers(users);
   } catch (err) {
@@ -204,6 +201,7 @@ async function saveUserModal(event) {
     if (result.success) {
       alert(userEditMode ? "User profile updated successfully!" : "User account created successfully!");
       closeUserModal();
+      invalidateCache("users");
       await loadUsers();
     } else {
       alert(result.message || "Failed to save user profile.");
@@ -235,6 +233,7 @@ async function deleteUser(username) {
 
     if (result.success) {
       alert("User profile deleted successfully!");
+      invalidateCache("users");
       await loadUsers();
     } else {
       alert(result.message || "Failed to delete user.");
