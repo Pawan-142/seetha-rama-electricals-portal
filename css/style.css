@@ -16,6 +16,14 @@
   --danger: #ef4444;
   --danger-hover: #dc2626;
   
+  /* Action Buttons (Light Theme) */
+  --btn-action-edit-color: var(--primary);
+  --btn-action-edit-bg: rgba(37, 99, 235, 0.05);
+  --btn-action-edit-border: rgba(37, 99, 235, 0.2);
+  --btn-action-delete-color: var(--danger);
+  --btn-action-delete-bg: rgba(239, 68, 68, 0.05);
+  --btn-action-delete-border: rgba(239, 68, 68, 0.2);
+  
   /* Slate Scale */
   --slate-50: #f8fafc;
   --slate-100: #f1f5f9;
@@ -78,6 +86,14 @@ body.dark-theme {
   --input-color: #f1f5f9;
   --input-focus-bg: var(--slate-950);
   --input-bg-readonly: var(--slate-800);
+
+  /* Action Buttons (Dark Theme) */
+  --btn-action-edit-color: #60a5fa;
+  --btn-action-edit-bg: rgba(96, 165, 250, 0.12);
+  --btn-action-edit-border: rgba(96, 165, 250, 0.3);
+  --btn-action-delete-color: #f87171;
+  --btn-action-delete-bg: rgba(248, 113, 113, 0.12);
+  --btn-action-delete-border: rgba(248, 113, 113, 0.3);
 }
 
 /* ==========================================================================
@@ -2331,4 +2347,102 @@ main {
 }
 .theme-toggle-btn:hover svg {
   transform: rotate(45deg) scale(1.1);
+}
+
+/* ==========================================================================
+   TABLE & CARD ACTION BUTTONS (EDIT / DELETE / SELF)
+   ========================================================================== */
+
+/* Actions wrapper inside table cells */
+.table-actions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap; /* wraps with a clean gap on narrow viewports */
+  width: 100%;
+}
+
+/* Base style for small action buttons */
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card-solid);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-action svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  stroke-width: 2.2px;
+}
+
+/* Edit action button style */
+.btn-action.btn-edit {
+  color: var(--btn-action-edit-color);
+  background: var(--btn-action-edit-bg);
+  border-color: var(--btn-action-edit-border);
+}
+
+.btn-action.btn-edit:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.15);
+}
+
+.btn-action.btn-edit:active {
+  transform: translateY(1px);
+}
+
+/* Delete action button style */
+.btn-action.btn-delete {
+  color: var(--btn-action-delete-color);
+  background: var(--btn-action-delete-bg);
+  border-color: var(--btn-action-delete-border);
+}
+
+.btn-action.btn-delete:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.15);
+}
+
+.btn-action.btn-delete:active {
+  transform: translateY(1px);
+}
+
+/* Self action button (disabled/read-only user deletion) */
+.btn-action.btn-self {
+  background: var(--input-bg-readonly);
+  border-color: var(--input-border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+/* Overriding .mobile-card-actions borders for theme consistency */
+.mobile-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border-color) !important;
+  padding-top: 12px;
 }
