@@ -102,7 +102,7 @@ async function loadInvoice() {
           <input type="tel" id="invoiceCustomerPhone" class="form-control" placeholder="9876543210">
         </div>
         <div class="field-group">
-          <label>Email — PDF sent here <span class="req">*</span></label>
+          <label>Email Address (Optional)</label>
           <input type="email" id="invoiceCustomerEmail" class="form-control" placeholder="customer@gmail.com">
         </div>
       </div>
@@ -174,7 +174,7 @@ async function loadInvoice() {
         </button>
         <button class="btn btn-success" id="saveInvoiceBtn" onclick="saveAndEmailInvoice()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Save &amp; Email Invoice
+          Place Order
         </button>
       </div>
     </div>
@@ -841,7 +841,6 @@ async function saveAndEmailInvoice() {
 
   if (!name)  { showToast("Customer Name is required.", "warn"); return; }
   if (!phone) { showToast("Customer Phone is required.", "warn"); return; }
-  if (!email) { showToast("Customer Email is required for email delivery.", "warn"); return; }
 
   const items = gatherItems();
   if (!items.length || !items[0].productId) {
@@ -886,16 +885,17 @@ async function saveAndEmailInvoice() {
   btn.innerHTML = `<span class="spinner"></span> Saving…`;
 
   try {
-    // ── Generate compressed PDF base64 first ────────────────────
-    btn.innerHTML = `<span class="spinner"></span> Generating PDF Attachment…`;
-    renderInvoicePages(items);
-    await new Promise(r => setTimeout(r, 200)); // Let DOM settle
-
+    // ── Generate compressed PDF base64 first (if email is provided) ──
     let pdfBase64 = "";
-    try {
-      pdfBase64 = await generatePdfBase64();
-    } catch (pdfErr) {
-      console.warn("Could not generate base64 PDF for attachment:", pdfErr);
+    if (email) {
+      btn.innerHTML = `<span class="spinner"></span> Generating PDF Attachment…`;
+      renderInvoicePages(items);
+      await new Promise(r => setTimeout(r, 200)); // Let DOM settle
+      try {
+        pdfBase64 = await generatePdfBase64();
+      } catch (pdfErr) {
+        console.warn("Could not generate base64 PDF for attachment:", pdfErr);
+      }
     }
 
     // ── Compute totals ──────────────────────────────────────────
@@ -982,13 +982,17 @@ async function saveAndEmailInvoice() {
     document.getElementById("invoiceContainer").style.display = "block";
     window.scrollTo(0, 0);
 
-    if (result.emailSent === false) {
-      showToast(
-        `✅ Invoice ${invNo} saved! Print dialog opened for PDF. ⚠️ Email failed: ${result.emailError || "Gmail permission needed."}`,
-        "warn"
-      );
+    if (email) {
+      if (result.emailSent === false) {
+        showToast(
+          `✅ Order placed & Invoice ${invNo} saved! Print dialog opened. ⚠️ Email failed: ${result.emailError || "Gmail permission needed."}`,
+          "warn"
+        );
+      } else {
+        showToast(`✅ Order placed & Invoice ${invNo} saved & emailed to ${email}!`, "success");
+      }
     } else {
-      showToast(`✅ Invoice ${invNo} saved & emailed with PDF to ${email}!`, "success");
+      showToast(`✅ Order placed & Invoice ${invNo} saved successfully!`, "success");
     }
 
   } catch (err) {
@@ -996,7 +1000,7 @@ async function saveAndEmailInvoice() {
     showToast("Error: " + (err.message || "Unknown error. Check console."), "error");
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save &amp; Email Invoice`;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Place Order`;
   }
 }
 
