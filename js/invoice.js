@@ -172,9 +172,13 @@ async function loadInvoice() {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           Preview Invoice
         </button>
-        <button class="btn btn-success" id="saveInvoiceBtn" onclick="saveAndEmailInvoice()">
+        <button class="btn btn-success" id="saveInvoiceBtn" onclick="saveAndEmailInvoice(false)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
           Place Order
+        </button>
+        <button class="btn btn-primary" id="saveAndEmailBtn" onclick="saveAndEmailInvoice(true)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Place &amp; Email Order
         </button>
       </div>
     </div>
@@ -831,7 +835,7 @@ function renderInvoicePages(items) {
      2. GAS saves to sheet + sends HTML email
      3. Browser downloads PDF locally via Blob URL
 ------------------------------------------- */
-async function saveAndEmailInvoice() {
+async function saveAndEmailInvoice(sendEmail = false) {
   const name  = document.getElementById("invoiceCustomerName").value.trim();
   const phone = document.getElementById("invoiceCustomerPhone").value.trim();
   const email = document.getElementById("invoiceCustomerEmail").value.trim();
@@ -841,6 +845,7 @@ async function saveAndEmailInvoice() {
 
   if (!name)  { showToast("Customer Name is required.", "warn"); return; }
   if (!phone) { showToast("Customer Phone is required.", "warn"); return; }
+  if (sendEmail && !email) { showToast("Customer Email is required for email delivery.", "warn"); return; }
 
   const items = gatherItems();
   if (!items.length || !items[0].productId) {
@@ -880,14 +885,16 @@ async function saveAndEmailInvoice() {
     }
   }
 
-  const btn = document.getElementById("saveInvoiceBtn");
+  const btnId = sendEmail ? "saveAndEmailBtn" : "saveInvoiceBtn";
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> Saving…`;
 
   try {
     // ── Generate compressed PDF base64 first (if email is provided) ──
     let pdfBase64 = "";
-    if (email) {
+    if (sendEmail && email) {
       btn.innerHTML = `<span class="spinner"></span> Generating PDF Attachment…`;
       renderInvoicePages(items);
       await new Promise(r => setTimeout(r, 200)); // Let DOM settle
@@ -918,7 +925,7 @@ async function saveAndEmailInvoice() {
       invoiceDate:     invoiceDate,
       customerName:    name,
       customerPhone:   phone,
-      customerEmail:   email,
+      customerEmail:   sendEmail ? email : "",
       customerAddress: addr,
       subtotal,
       discountPercent,
@@ -982,7 +989,7 @@ async function saveAndEmailInvoice() {
     document.getElementById("invoiceContainer").style.display = "block";
     window.scrollTo(0, 0);
 
-    if (email) {
+    if (sendEmail && email) {
       if (result.emailSent === false) {
         showToast(
           `✅ Order placed & Invoice ${invNo} saved! Print dialog opened. ⚠️ Email failed: ${result.emailError || "Gmail permission needed."}`,
@@ -1000,7 +1007,11 @@ async function saveAndEmailInvoice() {
     showToast("Error: " + (err.message || "Unknown error. Check console."), "error");
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Place Order`;
+    if (sendEmail) {
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Place &amp; Email Order`;
+    } else {
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Place Order`;
+    }
   }
 }
 
@@ -1426,6 +1437,7 @@ function setInvoiceFieldsReadOnly(readOnly) {
   const inputs = container.querySelectorAll("input, select, textarea, button");
   inputs.forEach(el => {
     if (el.id === "saveInvoiceBtn" || 
+        el.id === "saveAndEmailBtn" || 
         el.classList.contains("btn-add-item") || 
         el.classList.contains("col-del") || 
         el.tagName === "INPUT" || 
@@ -1464,6 +1476,10 @@ function setInvoiceFieldsReadOnly(readOnly) {
   const saveBtn = document.getElementById("saveInvoiceBtn");
   if (saveBtn) {
     saveBtn.style.display = readOnly ? "none" : "";
+  }
+  const emailBtn = document.getElementById("saveAndEmailBtn");
+  if (emailBtn) {
+    emailBtn.style.display = readOnly ? "none" : "";
   }
 }
 
