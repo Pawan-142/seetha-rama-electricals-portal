@@ -885,10 +885,15 @@ async function saveAndEmailInvoice(sendEmail = false) {
     }
   }
 
+  const actionButtons = document.querySelectorAll(".inv-action-row button");
+  const saveInvoiceBtn = document.getElementById("saveInvoiceBtn");
+  const saveAndEmailBtn = document.getElementById("saveAndEmailBtn");
   const btnId = sendEmail ? "saveAndEmailBtn" : "saveInvoiceBtn";
   const btn = document.getElementById(btnId);
   if (!btn) return;
-  btn.disabled = true;
+
+  // Disable all buttons in action row to prevent double clicks or concurrent actions
+  actionButtons.forEach(b => b.disabled = true);
   btn.innerHTML = `<span class="spinner"></span> Saving…`;
 
   try {
@@ -969,11 +974,19 @@ async function saveAndEmailInvoice(sendEmail = false) {
       console.error("GAS fetch/parse error:", fetchErr);
       // Most likely: GAS needs re-authorization. Go to GAS editor → Run any function → Allow permissions.
       showToast("⚠️ GAS needs re-authorization. Open Apps Script editor → Run any function → Allow.", "error");
+      // Re-enable buttons on failure
+      actionButtons.forEach(b => b.disabled = false);
+      if (saveAndEmailBtn) saveAndEmailBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Place &amp; Email Order`;
+      if (saveInvoiceBtn) saveInvoiceBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Place Order`;
       return;
     }
 
     if (!result.success) {
       showToast(result.message || "Failed to save invoice.", "error");
+      // Re-enable buttons on failure
+      actionButtons.forEach(b => b.disabled = false);
+      if (saveAndEmailBtn) saveAndEmailBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Place &amp; Email Order`;
+      if (saveInvoiceBtn) saveInvoiceBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Place Order`;
       return;
     }
 
@@ -1002,15 +1015,22 @@ async function saveAndEmailInvoice(sendEmail = false) {
       showToast(`✅ Order placed & Invoice ${invNo} saved successfully!`, "success");
     }
 
+    // Silently reset the invoice creation form in the background so that the next order has a fresh setup & invoice number
+    setTimeout(() => {
+      loadInvoice();
+    }, 100);
+
   } catch (err) {
     console.error("saveAndEmailInvoice error:", err);
     showToast("Error: " + (err.message || "Unknown error. Check console."), "error");
   } finally {
-    btn.disabled = false;
-    if (sendEmail) {
-      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Place &amp; Email Order`;
-    } else {
-      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Place Order`;
+    // Re-enable action buttons
+    actionButtons.forEach(b => b.disabled = false);
+    if (saveAndEmailBtn) {
+      saveAndEmailBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Place &amp; Email Order`;
+    }
+    if (saveInvoiceBtn) {
+      saveInvoiceBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Place Order`;
     }
   }
 }
