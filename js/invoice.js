@@ -851,9 +851,19 @@ async function saveAndEmailInvoice() {
     showToast("All item quantities must be greater than 0.", "warn"); return;
   }
 
-  // Check stock for all items as a final safeguard
+  // Check stock for all items as a final safeguard (aggregated by product ID)
+  const productQtyMap = {};
+  items.forEach(item => {
+    if (item.productId) {
+      productQtyMap[item.productId] = (productQtyMap[item.productId] || 0) + item.qty;
+    }
+  });
+
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
+    if (!item.productId) continue;
+    const totalBilled = productQtyMap[item.productId];
+
     const rows = document.querySelectorAll("#invDesktopBody tr");
     let matchedStock = 999999;
     for (let r of rows) {
@@ -865,8 +875,8 @@ async function saveAndEmailInvoice() {
       }
     }
     
-    if (item.qty > matchedStock) {
-      showToast(`⚠️ Cannot save invoice. ${item.productName} has insufficient stock (Available: ${matchedStock}, Billed: ${item.qty}).`, "error");
+    if (totalBilled > matchedStock) {
+      showToast(`⚠️ Cannot save invoice. ${item.productName} has insufficient stock (Available: ${matchedStock}, Billed Total: ${totalBilled}).`, "error");
       return;
     }
   }
@@ -1295,22 +1305,40 @@ function makeSearchableSelect(selectEl, placeholderText) {
       noResultsDiv.className = 'search-select-option no-results';
       if (selectEl.id === "customerSelect") {
         noResultsDiv.style.cursor = 'default';
-        noResultsDiv.innerHTML = `
-          <div style="color: var(--slate-500); margin-bottom: 8px;">No matches found</div>
-          <button type="button" class="btn btn-primary btn-sm" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 13px;" onclick="openCustomerModalFromInvoice('${searchInput.value.trim().replace(/'/g, "\\'")}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Add New Customer
-          </button>
+        noResultsDiv.innerHTML = `<div style="color: var(--slate-500); margin-bottom: 8px;">No matches found</div>`;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-primary btn-sm';
+        btn.style.cssText = 'width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 13px;';
+        btn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Add New Customer
         `;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeDropdown();
+          window.lastActiveCustomerSelect = selectEl;
+          openCustomerModalFromInvoice(searchInput.value.trim());
+        });
+        noResultsDiv.appendChild(btn);
       } else if (selectEl.classList.contains("inv-sel") || selectEl.classList.contains("m-sel")) {
         noResultsDiv.style.cursor = 'default';
-        noResultsDiv.innerHTML = `
-          <div style="color: var(--slate-500); margin-bottom: 8px;">No matches found</div>
-          <button type="button" class="btn btn-primary btn-sm" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 13px;" onclick="openProductModalFromInvoice('${searchInput.value.trim().replace(/'/g, "\\'")}')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Add New Product
-          </button>
+        noResultsDiv.innerHTML = `<div style="color: var(--slate-500); margin-bottom: 8px;">No matches found</div>`;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-primary btn-sm';
+        btn.style.cssText = 'width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 13px;';
+        btn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Add New Product
         `;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeDropdown();
+          window.lastActiveProductSelect = selectEl;
+          openProductModalFromInvoice(searchInput.value.trim());
+        });
+        noResultsDiv.appendChild(btn);
       } else {
         noResultsDiv.textContent = 'No matches found';
       }
@@ -1359,7 +1387,10 @@ function makeSearchableSelect(selectEl, placeholderText) {
 
   // Intercept value property changes so programmatic updates (such as desktop <-> mobile syncs) update the trigger UI
   const descriptor = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
-  if (descriptor && !selectEl.hasOwnProperty('value')) {
+  if (descriptor) {
+    if (selectEl.hasOwnProperty('value')) {
+      delete selectEl.value;
+    }
     Object.defineProperty(selectEl, 'value', {
       configurable: true,
       get: function() {
@@ -1433,6 +1464,10 @@ function setInvoiceFieldsReadOnly(readOnly) {
 }
 
 function openCustomerModalFromInvoice(name) {
+  // Explicitly close all searchable dropdowns
+  document.querySelectorAll('.search-select-container.open').forEach(c => {
+    c.classList.remove('open');
+  });
   if (typeof openCustomerModal === 'function') {
     openCustomerModal();
     const nameInput = document.getElementById("c_name");
@@ -1444,6 +1479,10 @@ function openCustomerModalFromInvoice(name) {
 }
 
 function openProductModalFromInvoice(name) {
+  // Explicitly close all searchable dropdowns
+  document.querySelectorAll('.search-select-container.open').forEach(c => {
+    c.classList.remove('open');
+  });
   if (typeof openProductModal === 'function') {
     openProductModal();
     const nameInput = document.getElementById("p_name");

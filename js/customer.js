@@ -13,7 +13,7 @@ async function loadCustomers() {
   document.getElementById("customers").innerHTML = `
     <div class="inventory-header">
       <h2 style="margin: 0; font-size: 26px; font-weight: 700;">Customer Database</h2>
-      <button class="btn btn-success" onclick="openCustomerModal()">
+      <button class="btn btn-primary" onclick="openCustomerModal()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Add Customer
       </button>
@@ -64,8 +64,9 @@ function renderCustomers(customers) {
     return;
   }
 
-  let html = `
-    <div class="table-responsive">
+  // Desktop view HTML (table)
+  let desktopHtml = `
+    <div class="table-responsive desktop-only-view">
       <table class="table">
         <thead>
           <tr>
@@ -80,9 +81,17 @@ function renderCustomers(customers) {
         <tbody>
   `;
 
+  // Mobile view HTML (cards grid)
+  let mobileHtml = `
+    <div class="mobile-only-view customer-cards-grid">
+  `;
+
   customers.forEach(customer => {
-    html += `
-      <tr>
+    const searchText = (customer.customerId + ' ' + customer.name + ' ' + customer.phone + ' ' + (customer.email || '') + ' ' + (customer.address || '')).toLowerCase();
+
+    // Append to desktop table
+    desktopHtml += `
+      <tr data-search-text="${searchText}">
         <td style="font-weight: 600; color: var(--slate-600);">${customer.customerId || "N/A"}</td>
         <td style="font-weight: 600; color: var(--slate-900);">${customer.name || "Unnamed"}</td>
         <td>${customer.phone || "N/A"}</td>
@@ -96,23 +105,65 @@ function renderCustomers(customers) {
         </td>
       </tr>
     `;
+
+    // Append to mobile cards
+    mobileHtml += `
+      <div class="mobile-item-card" data-search-text="${searchText}">
+        <div class="mobile-card-header">
+          <div>
+            <span class="mobile-card-id">${customer.customerId || "N/A"}</span>
+          </div>
+          <div>
+            <span class="mobile-card-phone-badge">${customer.phone || "N/A"}</span>
+          </div>
+        </div>
+        <h4 class="mobile-card-title">${customer.name || "Unnamed"}</h4>
+        <div class="mobile-card-details">
+          <div class="detail-row">
+            <span>Email:</span>
+            <span style="color: var(--primary); font-weight: 500;">${customer.email || "N/A"}</span>
+          </div>
+          <div class="detail-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+            <span>Billing Address:</span>
+            <span style="line-height: 1.4; color: var(--slate-600);">${customer.address || "N/A"}</span>
+          </div>
+        </div>
+        <div class="mobile-card-actions">
+          <button class="btn btn-outline btn-sm" style="flex: 1; border-color: var(--primary); color: var(--primary);" onclick="openEditCustomerModal('${customer.customerId}')">Edit</button>
+          <button class="btn btn-outline text-danger btn-sm" style="flex: 1; border-color: var(--danger); color: var(--danger);" onclick="deleteCustomer('${customer.customerId}')">Delete</button>
+        </div>
+      </div>
+    `;
   });
 
-  html += `
+  desktopHtml += `
         </tbody>
       </table>
     </div>
   `;
 
-  document.getElementById("customerTable").innerHTML = html;
+  mobileHtml += `
+    </div>
+  `;
+
+  document.getElementById("customerTable").innerHTML = desktopHtml + mobileHtml;
 }
 
 function searchCustomer(keyword) {
-  const rows = document.querySelectorAll("#customerTable tbody tr");
   const cleanedKeyword = keyword.toLowerCase().trim();
 
+  // Search table rows
+  const rows = document.querySelectorAll("#customerTable tbody tr");
   rows.forEach(row => {
-    row.style.display = row.innerText.toLowerCase().includes(cleanedKeyword) ? "" : "none";
+    const text = row.getAttribute("data-search-text") || row.innerText.toLowerCase();
+    row.style.display = text.includes(cleanedKeyword) ? "" : "none";
+  });
+
+  // Search mobile cards
+  const cards = document.querySelectorAll("#customerTable .mobile-item-card");
+  cards.forEach(card => {
+    const text = card.getAttribute("data-search-text") || card.innerText.toLowerCase();
+    card.style.display = text.includes(cleanedKeyword) ? "" : "none";
   });
 }
 
@@ -189,22 +240,21 @@ async function saveCustomerModal(event) {
     const result = await response.json();
 
     if (result.success) {
-      alert(customerEditMode ? "Customer details updated successfully!" : "Customer added successfully to database!");
+      showToast(customerEditMode ? "Customer details updated successfully!" : "Customer added successfully to database!", "success");
+      const isFromInvoice = window.customerCreatedFromInvoice;
       closeCustomerModal();
       invalidateCache("customers");
-      if (window.customerCreatedFromInvoice) {
-        window.customerCreatedFromInvoice = false;
+      if (isFromInvoice) {
         if (typeof fetchAutocompleteData === 'function') {
           await fetchAutocompleteData();
-          if (typeof customerDatabase !== 'undefined') {
-            const newCustName = data.name.toLowerCase();
-            const newCust = customerDatabase.find(c => c.name.toLowerCase() === newCustName);
-            if (newCust) {
-              const sel = document.getElementById("customerSelect");
-              if (sel) {
-                sel.value = newCust.customerId;
-                sel.dispatchEvent(new Event('change'));
-              }
+          const customersList = window.sreCache.customers || [];
+          const newCustName = data.name.toLowerCase().trim();
+          const newCust = customersList.find(c => (c.name || '').toLowerCase().trim() === newCustName);
+          if (newCust) {
+            const sel = document.getElementById("customerSelect");
+            if (sel) {
+              sel.value = newCust.customerId;
+              sel.dispatchEvent(new Event('change'));
             }
           }
         }
@@ -212,11 +262,11 @@ async function saveCustomerModal(event) {
         await loadCustomers();
       }
     } else {
-      alert(result.message || "Failed to save customer details.");
+      showToast(result.message || "Failed to save customer details.", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Connection error. Could not write customer to sheet.");
+    showToast("Connection error. Could not write customer to sheet.", "error");
   } finally {
     submitBtn.innerText = customerEditMode ? "Save Changes" : "Save Customer";
     submitBtn.disabled = false;
@@ -240,14 +290,23 @@ async function deleteCustomer(customerId) {
     const result = await response.json();
 
     if (result.success) {
-      alert("Customer deleted successfully!");
+      showToast("Customer deleted successfully!", "success");
       invalidateCache("customers");
       await loadCustomers();
     } else {
-      alert(result.message || "Failed to delete the customer.");
+      showToast(result.message || "Failed to delete the customer.", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Connection error. Could not delete customer.");
+    showToast("Connection error. Could not delete customer.", "error");
   }
 }
+
+document.addEventListener("sreCacheUpdated", (e) => {
+  if (e.detail.action === "customers") {
+    const customersEl = document.getElementById("customers");
+    if (customersEl && customersEl.style.display === "block") {
+      fetchCustomers();
+    }
+  }
+});

@@ -8,22 +8,36 @@ let categoryChartInstance = null;
 let dashboardSalesRaw = [];
 let productCategoryMap = {};
 
-// Helper: parse date safely
+// Helper: parse date safely in local timezone
 function _parseDashboardDate(dateVal) {
   if (!dateVal) return new Date(0);
-  const d = new Date(dateVal);
-  if (!isNaN(d.getTime())) return d;
+  if (dateVal instanceof Date) return dateVal;
   
   // Format YYYY-MM-DD or DD-MM-YYYY
   const parts = dateVal.toString().split(/[\/\-\s]/);
   if (parts.length >= 3) {
     if (parts[0].length === 4) {
-      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      // YYYY-MM-DD
+      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 0, 0, 0, 0);
     } else if (parts[2].substring(0, 4).length === 4) {
-      return new Date(parseInt(parts[2].substring(0, 4), 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+      // DD-MM-YYYY
+      return new Date(parseInt(parts[2].substring(0, 4), 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10), 0, 0, 0, 0);
     }
   }
+  
+  const d = new Date(dateVal);
+  if (!isNaN(d.getTime())) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+  }
   return new Date(0);
+}
+
+// Helper: format Date object to YYYY-MM-DD in local time
+function _formatLocalDate(dateObj) {
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 // Helper: generate array of dates between start and end inclusive
@@ -203,7 +217,8 @@ async function loadDashboard() {
       <!-- Recent Sales Section -->
       <div class="card-box">
         <h3 class="mb-4" style="font-size: 18px; font-weight: 700; margin-bottom: 20px;">Recent Sales Transactions</h3>
-        <div class="table-responsive" style="box-shadow: none; border: none; padding: 0;">
+        <!-- Desktop Table View -->
+        <div class="desktop-only-view table-responsive" style="box-shadow: none; border: none; padding: 0;">
           <table class="table" style="font-size: 13.5px;">
             <thead>
               <tr>
@@ -219,6 +234,10 @@ async function loadDashboard() {
               </tr>
             </tbody>
           </table>
+        </div>
+        <!-- Mobile Cards View -->
+        <div class="mobile-only-view" id="recentSalesCards" style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="text-align: center; color: var(--slate-400); padding: 20px;">Loading transactions...</div>
         </div>
       </div>
 
@@ -257,37 +276,73 @@ async function loadDashboard() {
       maximumFractionDigits: 2
     });
 
-    // 2. Populate Recent Sales Table
+    // 2. Populate Recent Sales (Table & Mobile Cards)
     const salesBody = document.getElementById("recentSalesBody");
+    const salesCards = document.getElementById("recentSalesCards");
     const recent = statsRes.recentSales || [];
     if (recent.length === 0) {
-      salesBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--slate-500);">No sales recorded yet</td></tr>`;
+      if (salesBody) salesBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--slate-500); padding: 30px;">No sales recorded yet</td></tr>`;
+      if (salesCards) salesCards.innerHTML = `<p style="text-align: center; color: var(--slate-500); padding: 20px;">No sales recorded yet</p>`;
     } else {
-      salesBody.innerHTML = recent.map(sale => `
-        <tr>
-          <td>${sale.date}</td>
-          <td style="font-weight: 600; color: var(--primary);">${sale.invoiceNo}</td>
-          <td>${sale.customerName}</td>
-          <td style="font-weight: 700;">₹${(Number(sale.grandTotal) || 0).toFixed(2)}</td>
-        </tr>
-      `).join('');
+      if (salesBody) {
+        salesBody.innerHTML = recent.map(sale => `
+          <tr>
+            <td>${sale.date}</td>
+            <td style="font-weight: 600; color: var(--primary);">${sale.invoiceNo}</td>
+            <td>${sale.customerName}</td>
+            <td style="font-weight: 700;">₹${(Number(sale.grandTotal) || 0).toFixed(2)}</td>
+          </tr>
+        `).join('');
+      }
+      if (salesCards) {
+        salesCards.innerHTML = recent.map(sale => `
+          <div class="mobile-item-card">
+            <div class="mobile-card-header" style="border-bottom: none; padding-bottom: 0;">
+              <div>
+                <span class="mobile-card-id">${sale.invoiceNo}</span>
+                <span class="mobile-card-category" style="color: var(--slate-500); text-transform: none; letter-spacing: normal; margin-left: 8px;">${sale.date}</span>
+              </div>
+              <div>
+                <span class="badge badge-success" style="font-weight: 700; font-size: 12.5px; background: rgba(37, 99, 235, 0.1); color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.2);">₹${(Number(sale.grandTotal) || 0).toFixed(2)}</span>
+              </div>
+            </div>
+            <div style="font-size: 13.5px; font-weight: 600; color: var(--slate-800); padding: 0 4px; display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <span style="color: var(--text-muted);">Customer:</span>
+              <strong style="color: var(--slate-950);">${sale.customerName}</strong>
+            </div>
+          </div>
+        `).join('');
+      }
     }
 
-    // 3. Populate Low Stock Alerts List
+    // 3. Populate Low Stock Alerts List (Premium Badges)
     const stockList = document.getElementById("lowStockList");
     const low = statsRes.lowStock || [];
     if (low.length === 0) {
       stockList.innerHTML = `<p style="text-align: center; color: var(--success); font-weight: 500; padding: 20px;">All stock levels healthy!</p>`;
     } else {
-      stockList.innerHTML = low.map(item => `
-        <div class="low-stock-item">
-          <div>
-            <strong style="display: block; font-size: 14.5px; color: var(--slate-800);">${item.productName}</strong>
-            <span style="font-size: 12px; color: var(--text-muted);">${item.productId} | ₹${(Number(item.rate) || 0).toFixed(2)}</span>
+      stockList.innerHTML = low.map(item => {
+        const stock = Number(item.stock) || 0;
+        const isOutOfStock = stock <= 0;
+        const badgeBg = isOutOfStock ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)';
+        const badgeColor = isOutOfStock ? 'var(--danger)' : 'var(--warning)';
+        const borderCol = isOutOfStock ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
+        const statusText = isOutOfStock ? 'Out of stock' : `${stock} left`;
+        const icon = isOutOfStock ? '🚨' : '⚠️';
+        
+        return `
+          <div class="low-stock-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255, 255, 255, 0.65); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 10px; transition: all 0.2s;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 16px;">${icon}</span>
+              <div>
+                <strong style="display: block; font-size: 14px; color: var(--slate-800);">${item.productName}</strong>
+                <span style="font-size: 12px; color: var(--text-muted);">${item.productId} | ₹${(Number(item.rate) || 0).toFixed(2)}</span>
+              </div>
+            </div>
+            <span class="badge" style="background: ${badgeBg}; color: ${badgeColor}; border: 1px solid ${borderCol}; font-weight: 700; font-size: 12px;">${statusText}</span>
           </div>
-          <span class="low-stock-badge">${item.stock} left</span>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // 4. Initialize and render each chart separately with defaults
@@ -297,7 +352,10 @@ async function loadDashboard() {
 
   } catch (err) {
     console.error(err);
-    document.getElementById("recentSalesBody").innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--danger);">Unable to connect to Google Sheets backend.</td></tr>`;
+    const body = document.getElementById("recentSalesBody");
+    const cards = document.getElementById("recentSalesCards");
+    if (body) body.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--danger);">Unable to connect to Google Sheets backend.</td></tr>`;
+    if (cards) cards.innerHTML = `<p style="text-align: center; color: var(--danger); padding: 20px;">Unable to connect to Google Sheets backend.</p>`;
     document.getElementById("lowStockList").innerHTML = `<p style="text-align: center; color: var(--danger);">Error loading stock alerts.</p>`;
   }
 }
@@ -307,7 +365,7 @@ function handleDashboardSalesFilterChange(val) {
   const datesContainer = document.getElementById("salesCustomDates");
   if (val === "custom") {
     datesContainer.style.display = "inline-flex";
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = _formatLocalDate(new Date());
     document.getElementById("salesStartDate").value = todayStr;
     document.getElementById("salesEndDate").value = todayStr;
     applyDashboardSalesCustomFilter();
@@ -330,7 +388,7 @@ function updateSalesChart(filterType, customStart = null, customEnd = null) {
   const dailySums = {};
   filtered.forEach(sale => {
     const d = _parseDashboardDate(sale.date);
-    const key = d.toISOString().split("T")[0];
+    const key = _formatLocalDate(d);
     dailySums[key] = (dailySums[key] || 0) + (parseFloat(sale.grandTotal) || 0);
   });
 
@@ -340,7 +398,7 @@ function updateSalesChart(filterType, customStart = null, customEnd = null) {
   const dataPoints = [];
 
   dates.forEach(d => {
-    const key = d.toISOString().split("T")[0];
+    const key = _formatLocalDate(d);
     const labelStr = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
     labels.push(labelStr);
     dataPoints.push(dailySums[key] || 0);
@@ -403,7 +461,7 @@ function handleProductsFilterChange(val) {
   const datesContainer = document.getElementById("productsCustomDates");
   if (val === "custom") {
     datesContainer.style.display = "inline-flex";
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = _formatLocalDate(new Date());
     document.getElementById("productsStartDate").value = todayStr;
     document.getElementById("productsEndDate").value = todayStr;
     applyProductsCustomFilter();
@@ -497,7 +555,7 @@ function handleCategoryFilterChange(val) {
   const datesContainer = document.getElementById("categoryCustomDates");
   if (val === "custom") {
     datesContainer.style.display = "inline-flex";
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = _formatLocalDate(new Date());
     document.getElementById("categoryStartDate").value = todayStr;
     document.getElementById("categoryEndDate").value = todayStr;
     applyCategoryCustomFilter();
@@ -608,4 +666,28 @@ function setActiveNav(navId) {
   });
   const current = document.getElementById(navId);
   if (current) current.classList.add("active");
+
+  // Automatically close mobile menu on tab switch
+  const sidebar = document.querySelector(".sidebar");
+  if (sidebar) {
+    sidebar.classList.remove("mobile-nav-open");
+  }
 }
+
+document.addEventListener("sreCacheUpdated", (e) => {
+  if (e.detail.action === "dashboard" || e.detail.action === "sales" || e.detail.action === "inventory") {
+    const dashboardEl = document.getElementById("dashboard");
+    if (dashboardEl && dashboardEl.style.display === "block") {
+      // Re-load the dashboard charts and metrics silently in the background
+      const [totalProducts, totalCustomers, totalSales] = [
+        document.getElementById("totalProducts"),
+        document.getElementById("totalCustomers"),
+        document.getElementById("totalSales")
+      ];
+      // Only reload if the DOM element exists
+      if (totalProducts && totalCustomers && totalSales) {
+        loadDashboard();
+      }
+    }
+  }
+});

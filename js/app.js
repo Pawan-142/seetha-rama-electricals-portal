@@ -81,3 +81,13 @@ function togglePasswordVisibility(inputId, btn) {
     `;
   }
 }
+
+/**
+ * Toggles the mobile navigation drawer menu visibility
+ */
+function toggleMobileMenu() {
+  const sidebar = document.querySelector(".sidebar");
+  if (sidebar) {
+    sidebar.classList.toggle("mobile-nav-open");
+  }
+}

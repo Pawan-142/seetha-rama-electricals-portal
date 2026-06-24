@@ -9,190 +9,65 @@ function renderLogin() {
       <!-- Animated Particles -->
       <div class="login-particles" id="loginParticles"></div>
 
-      <!-- ==================== LEFT PANEL ==================== -->
-      <div class="login-left">
-        <!-- Top Content Area -->
-        <div class="login-left-top">
-          <!-- SR Logo -->
-          <div class="sre-logo-group">
-            <div class="sre-logo-mark">
-              <span class="sre-logo-icon">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="rgba(255,255,255,0.9)" stroke="none"/>
-                </svg>
-              </span>
-            </div>
-            <div class="sre-logo-title-wrap">
-              <div class="sre-logo-title">SEETHA RAMA</div>
-              <div class="sre-logo-subtitle">ELECTRICALS</div>
-            </div>
-          </div>
-
-          <!-- Category Tabs (Styled as glowing pills with no hard pipe separators) -->
-          <div class="sre-cat-tabs">
-            <div class="sre-cat-tab sre-cat-active" id="catElectrical">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              <span>Electrical</span>
-            </div>
-            <div class="sre-cat-tab" id="catPlumbing">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 20V10m0 0c0-4 3-7 6-7s6 3 6 7m-12 0h12m0 0v10M10 14v2m4-2v2"/></svg>
-              <span>Plumbing</span>
-            </div>
-            <div class="sre-cat-tab" id="catHardware">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
-              <span>Hardware</span>
-            </div>
-            <div class="sre-cat-tab" id="catLighting">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-              <span>Lighting</span>
-            </div>
-          </div>
+      <!-- Frosted Glass Login Card -->
+      <div class="sre-login-card" id="loginFormCard">
+        <!-- Logo -->
+        <div class="sre-card-logo">
+          <img src="assets/logo.png" alt="SRE Logo">
         </div>
 
-        <!-- Product Showcase Image -->
-        <div class="sre-showcase" id="sreShowcase">
-          <img src="assets/product-showcase.png"
-               alt="Electrical, Plumbing &amp; Hardware Products"
-               class="sre-showcase-img" id="showcaseImg">
-          <div class="sre-showcase-overlay"></div>
-          <div class="sre-glow sre-glow-top"></div>
-          <div class="sre-glow sre-glow-bottom"></div>
+        <div class="sre-card-title">Welcome Back!</div>
+        <div class="sre-card-sub">Sign in to your account</div>
 
-          <!-- Feature badges overlaid at bottom of image -->
-          <div class="sre-features-row">
-            <div class="sre-feature">
-              <span class="sre-feature-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              </span>
-              <strong>Trusted Brands</strong>
-              <small>100% Genuine Products</small>
-            </div>
-            <div class="sre-feature">
-              <span class="sre-feature-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-              </span>
-              <strong>Quality Assured</strong>
-              <small>Best Quality Guaranteed</small>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==================== RIGHT PANEL ==================== -->
-      <div class="login-right" id="loginRight">
-        <!-- Frosted Glass Login Card -->
-        <div class="sre-login-card" id="loginFormCard">
-          <!-- House + Lightning Icon -->
-          <div class="sre-card-logo">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
-              <path d="M12 8l-2 4h4l-2 4" stroke="#f97316" stroke-width="1.6" fill="rgba(249,115,22,0.12)"/>
-            </svg>
+        <form onsubmit="handleLoginSubmit(event)" id="loginForm">
+          <!-- Username -->
+          <label class="sre-field-label" for="username">Username</label>
+          <div class="sre-input-wrap">
+            <span class="sre-input-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </span>
+            <input type="text" id="username" placeholder="Enter username"
+                   class="sre-input" required autocomplete="username">
           </div>
 
-          <div class="sre-card-title">Welcome Back!</div>
-          <div class="sre-card-sub">Sign in to access your dashboard</div>
-
-          <form onsubmit="handleLoginSubmit(event)" id="loginForm">
-            <!-- Username -->
-            <label class="sre-field-label" for="username">Username</label>
-            <div class="sre-input-wrap">
-              <span class="sre-input-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-              </span>
-              <input type="text" id="username" placeholder="Enter username"
-                     class="sre-input" required autocomplete="username">
-            </div>
-
-            <!-- Password -->
-            <label class="sre-field-label" for="password">Password</label>
-            <div class="sre-input-wrap">
-              <span class="sre-input-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0110 0v4"/>
-                </svg>
-              </span>
-              <input type="password" id="password" placeholder="Enter password"
-                     class="sre-input" required autocomplete="current-password">
-              <button type="button" class="sre-eye-btn" onclick="togglePasswordVisibility('password', this)">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                </svg>
-              </button>
-            </div>
-
-            <!-- Remember Me + Forgot -->
-            <div class="sre-form-row">
-              <label class="sre-checkbox">
-                <input type="checkbox" id="rememberMe" checked>
-                <span class="sre-checkmark"></span>
-                Remember me
-              </label>
-              <a href="#" class="sre-forgot" onclick="event.preventDefault()">Forgot Password?</a>
-            </div>
-
-            <!-- Sign In Button -->
-            <button type="submit" id="loginBtn" class="sre-signin-btn">
-              <span>Sign In</span>
-              <span class="sre-btn-arrow">&rarr;</span>
+          <!-- Password -->
+          <label class="sre-field-label" for="password">Password</label>
+          <div class="sre-input-wrap">
+            <span class="sre-input-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+            </span>
+            <input type="password" id="password" placeholder="Enter password"
+                   class="sre-input" required autocomplete="current-password">
+            <button type="button" class="sre-eye-btn" onclick="togglePasswordVisibility('password', this)">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
             </button>
-          </form>
-
-          <!-- Divider -->
-          <div class="sre-divider">or</div>
-
-          <!-- Secure Admin Access Button -->
-          <button class="sre-admin-btn" onclick="document.getElementById('loginBtn').click()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            Secure Admin Access
-          </button>
-
-          <!-- Info Strip -->
-          <div class="sre-info-strip">
-            <div class="sre-info-item">
-              <span class="sre-info-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-              </span>
-              <strong>Secured Data</strong>
-              <small>Data is safe</small>
-            </div>
-            <div class="sre-info-item">
-              <span class="sre-info-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
-                </svg>
-              </span>
-              <strong>GST Billing</strong>
-              <small>Accurate GST</small>
-            </div>
-            <div class="sre-info-item">
-              <span class="sre-info-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <polyline points="1 4 1 10 7 10"/>
-                  <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
-                </svg>
-              </span>
-              <strong>Easy Returns</strong>
-              <small>Hassle-free</small>
-            </div>
           </div>
 
-          <!-- Copyright -->
-          <div class="sre-copyright-right">&copy; 2026 Seetha Rama Electricals. All rights reserved.</div>
-        </div>
+          <!-- Remember Me -->
+          <div class="sre-form-row">
+            <label class="sre-checkbox">
+              <input type="checkbox" id="rememberMe" checked>
+              <span class="sre-checkmark"></span>
+              Remember me
+            </label>
+          </div>
+
+          <!-- Sign In Button -->
+          <button type="submit" id="loginBtn" class="sre-signin-btn">
+            <span>Sign In</span>
+            <span class="sre-btn-arrow">&rarr;</span>
+          </button>
+        </form>
+
+        <!-- Copyright -->
+        <div class="sre-copyright-right" style="margin-top: 12px; text-align: center; font-size: 11px; color: var(--slate-400);">&copy; 2026 Seetha Rama Electricals.</div>
       </div>
     </div>
   `;
@@ -348,7 +223,7 @@ async function handleLoginSubmit(event) {
     }
   } catch (err) {
     console.error(err);
-    alert("Connection to the server failed. Please check your network.");
+    showToast("Connection to the server failed. Please check your network.", "error");
     loginBtn.innerText = "Sign In";
     loginBtn.disabled = false;
   }
@@ -421,7 +296,7 @@ async function saveChangePasswordModal(event) {
   const confirmPass = document.getElementById("cp_confirm").value;
   
   if (newPass !== confirmPass) {
-    alert("New passwords do not match!");
+    showToast("New passwords do not match!", "warn");
     return;
   }
   
@@ -447,14 +322,14 @@ async function saveChangePasswordModal(event) {
     
     const result = await response.json();
     if (result.success) {
-      alert("Password updated successfully!");
+      showToast("Password updated successfully!", "success");
       closeChangePasswordModal();
     } else {
-      alert(result.message || "Failed to update password.");
+      showToast(result.message || "Failed to update password.", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Connection error. Password could not be updated.");
+    showToast("Connection error. Password could not be updated.", "error");
   } finally {
     submitBtn.innerText = "Update Password";
     submitBtn.disabled = false;

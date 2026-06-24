@@ -72,8 +72,9 @@ function renderInventory(products) {
   const user = JSON.parse(localStorage.getItem("sre_user") || "{}");
   const isStaff = user.role === 'staff';
 
-  let html = `
-    <div class="table-responsive">
+  // Desktop view HTML (table)
+  let desktopHtml = `
+    <div class="table-responsive desktop-only-view">
       <table class="table">
         <thead>
           <tr>
@@ -90,6 +91,11 @@ function renderInventory(products) {
           </tr>
         </thead>
         <tbody>
+  `;
+
+  // Mobile view HTML (cards grid)
+  let mobileHtml = `
+    <div class="mobile-only-view inventory-cards-grid">
   `;
 
   products.forEach(product => {
@@ -110,8 +116,11 @@ function renderInventory(products) {
       trClass = 'class="low-stock-row"';
     }
 
-    html += `
-      <tr ${trClass}>
+    const searchText = (product.productId + ' ' + product.productName + ' ' + (product.category || '')).toLowerCase();
+
+    // Append to desktop table
+    desktopHtml += `
+      <tr ${trClass} data-search-text="${searchText}">
         <td style="font-weight: 600; color: var(--slate-600);">${product.productId || "N/A"}</td>
         <td style="font-weight: 600; color: var(--slate-900);">${product.productName || "Unnamed"}</td>
         <td>${product.category || "N/A"}</td>
@@ -129,23 +138,76 @@ function renderInventory(products) {
         `}
       </tr>
     `;
+
+    // Append to mobile cards
+    mobileHtml += `
+      <div class="mobile-item-card ${stock < minStock ? 'low-stock-card' : ''}" data-search-text="${searchText}">
+        <div class="mobile-card-header">
+          <div>
+            <span class="mobile-card-id">${product.productId || "N/A"}</span>
+            <span class="mobile-card-category">${product.category || "N/A"}</span>
+          </div>
+          <div>
+            <span class="badge ${badgeClass}">Stock: ${stock}</span>
+          </div>
+        </div>
+        <h4 class="mobile-card-title">${product.productName || "Unnamed"}</h4>
+        <div class="mobile-card-details">
+          <div class="detail-row">
+            <span>Base Rate:</span>
+            <strong>₹${rate.toFixed(2)}</strong>
+          </div>
+          <div class="detail-row">
+            <span>Tax (CGST/SGST):</span>
+            <span>${product.cgst || "9"}% / ${product.sgst || "9"}%</span>
+          </div>
+          <div class="detail-row">
+            <span>Unit:</span>
+            <span>${product.unit || "Nos"}</span>
+          </div>
+          <div class="detail-row">
+            <span>Min Limit:</span>
+            <span>${minStock}</span>
+          </div>
+        </div>
+        ${isStaff ? '' : `
+        <div class="mobile-card-actions">
+          <button class="btn btn-outline btn-sm" style="flex: 1; border-color: var(--primary); color: var(--primary);" onclick="openEditProductModal('${product.productId}')">Edit</button>
+          <button class="btn btn-outline text-danger btn-sm" style="flex: 1; border-color: var(--danger); color: var(--danger);" onclick="deleteProduct('${product.productId}')">Delete</button>
+        </div>
+        `}
+      </div>
+    `;
   });
 
-  html += `
+  desktopHtml += `
         </tbody>
       </table>
     </div>
   `;
 
-  document.getElementById("inventoryTable").innerHTML = html;
+  mobileHtml += `
+    </div>
+  `;
+
+  document.getElementById("inventoryTable").innerHTML = desktopHtml + mobileHtml;
 }
 
 function searchInventory(keyword) {
-  const rows = document.querySelectorAll("#inventoryTable tbody tr");
   const cleanedKeyword = keyword.toLowerCase().trim();
 
+  // Search table rows
+  const rows = document.querySelectorAll("#inventoryTable tbody tr");
   rows.forEach(row => {
-    row.style.display = row.innerText.toLowerCase().includes(cleanedKeyword) ? "" : "none";
+    const text = row.getAttribute("data-search-text") || row.innerText.toLowerCase();
+    row.style.display = text.includes(cleanedKeyword) ? "" : "none";
+  });
+
+  // Search mobile cards
+  const cards = document.querySelectorAll("#inventoryTable .mobile-item-card");
+  cards.forEach(card => {
+    const text = card.getAttribute("data-search-text") || card.innerText.toLowerCase();
+    card.style.display = text.includes(cleanedKeyword) ? "" : "none";
   });
 }
 
@@ -230,23 +292,30 @@ async function saveProductModal(event) {
     const result = await response.json();
 
     if (result.success) {
-      alert(inventoryEditMode ? "Product updated successfully!" : "Product added successfully!");
+      showToast(inventoryEditMode ? "Product updated successfully!" : "Product added successfully!", "success");
       closeProductModal();
       invalidateCache("inventory");
       if (window.productCreatedFromInvoice) {
         window.productCreatedFromInvoice = false;
+        if (window.lastActiveProductSelect) {
+          window.lastActiveProductSelect.value = result.productId;
+        }
         if (typeof fetchAutocompleteData === 'function') {
           await fetchAutocompleteData();
+        }
+        if (window.lastActiveProductSelect) {
+          window.lastActiveProductSelect.dispatchEvent(new Event('change'));
+          window.lastActiveProductSelect = null;
         }
       } else {
         await loadInventory();
       }
     } else {
-      alert(result.message || "Failed to save the product details.");
+      showToast(result.message || "Failed to save the product details.", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Connection error. Could not write to the Sheets API.");
+    showToast("Connection error. Could not write to the Sheets API.", "error");
   } finally {
     submitBtn.innerText = inventoryEditMode ? "Save Changes" : "Save Product";
     submitBtn.disabled = false;
@@ -270,14 +339,23 @@ async function deleteProduct(productId) {
     const result = await response.json();
 
     if (result.success) {
-      alert("Product deleted successfully!");
+      showToast("Product deleted successfully!", "success");
       invalidateCache("inventory");
       await loadInventory();
     } else {
-      alert(result.message || "Failed to delete the product.");
+      showToast(result.message || "Failed to delete the product.", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Connection error. Could not delete product.");
+    showToast("Connection error. Could not delete product.", "error");
   }
 }
+
+document.addEventListener("sreCacheUpdated", (e) => {
+  if (e.detail.action === "inventory") {
+    const inventoryEl = document.getElementById("inventory");
+    if (inventoryEl && inventoryEl.style.display === "block") {
+      fetchInventory();
+    }
+  }
+});

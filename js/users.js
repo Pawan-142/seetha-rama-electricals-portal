@@ -199,16 +199,16 @@ async function saveUserModal(event) {
     const result = await response.json();
 
     if (result.success) {
-      alert(userEditMode ? "User profile updated successfully!" : "User account created successfully!");
+      showToast(userEditMode ? "User profile updated successfully!" : "User account created successfully!", "success");
       closeUserModal();
       invalidateCache("users");
       await loadUsers();
     } else {
-      alert(result.message || "Failed to save user profile.");
+      showToast(result.message || "Failed to save user profile.", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Connection error. Could not write user to Sheets.");
+    showToast("Connection error. Could not write user to Sheets.", "error");
   } finally {
     submitBtn.innerText = userEditMode ? "Save Changes" : "Save Profile";
     submitBtn.disabled = false;
@@ -232,14 +232,23 @@ async function deleteUser(username) {
     const result = await response.json();
 
     if (result.success) {
-      alert("User profile deleted successfully!");
+      showToast("User profile deleted successfully!", "success");
       invalidateCache("users");
       await loadUsers();
     } else {
-      alert(result.message || "Failed to delete user.");
+      showToast(result.message || "Failed to delete user.", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Connection error. Could not delete user.");
+    showToast("Connection error. Could not delete user.", "error");
   }
 }
+
+document.addEventListener("sreCacheUpdated", (e) => {
+  if (e.detail.action === "users") {
+    const usersEl = document.getElementById("users");
+    if (usersEl && usersEl.style.display === "block") {
+      fetchUsers();
+    }
+  }
+});

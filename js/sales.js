@@ -152,8 +152,7 @@ function handleSalesFilterChange(val) {
 
 function parseRawDate(dateInput) {
   if (!dateInput) return new Date(0);
-  const d = new Date(dateInput);
-  if (!isNaN(d.getTime())) return d;
+  if (dateInput instanceof Date) return dateInput;
   
   const parts = dateInput.toString().split(/[\/\-\s]/);
   if (parts.length >= 3) {
@@ -162,14 +161,19 @@ function parseRawDate(dateInput) {
       const year = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10) - 1;
       const day = parseInt(parts[2], 10);
-      return new Date(year, month, day);
+      return new Date(year, month, day, 0, 0, 0, 0);
     } else if (parts[2].substring(0, 4).length === 4) {
       // dd-MM-yyyy
       const day = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10) - 1;
       const year = parseInt(parts[2].substring(0, 4), 10);
-      return new Date(year, month, day);
+      return new Date(year, month, day, 0, 0, 0, 0);
     }
+  }
+  
+  const d = new Date(dateInput);
+  if (!isNaN(d.getTime())) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
   }
   return new Date(0);
 }
@@ -263,9 +267,9 @@ function renderTodaySales(sales) {
     return;
   }
 
-  // Render table
-  let html = `
-    <div class="table-responsive">
+  // Render views (Desktop Table & Mobile Cards)
+  let desktopHtml = `
+    <div class="desktop-only-view table-responsive">
       <table class="table">
         <thead>
           <tr>
@@ -281,6 +285,10 @@ function renderTodaySales(sales) {
           </tr>
         </thead>
         <tbody>
+  `;
+
+  let mobileHtml = `
+    <div class="mobile-only-view inventory-cards-grid">
   `;
 
   sales.forEach(sale => {
@@ -300,7 +308,8 @@ function renderTodaySales(sales) {
       formattedDate = d.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric" });
     }
 
-    html += `
+    // Desktop row
+    desktopHtml += `
       <tr>
         <td style="font-weight: 600; color: var(--slate-600);">${formattedDate}</td>
         <td style="font-weight: 700; color: var(--primary);">${saleId}</td>
@@ -317,23 +326,70 @@ function renderTodaySales(sales) {
         </td>
       </tr>
     `;
+
+    // Mobile card
+    mobileHtml += `
+      <div class="mobile-item-card">
+        <div class="mobile-card-header">
+          <div>
+            <span class="mobile-card-id">${saleId}</span>
+            <span class="mobile-card-category" style="color: var(--slate-500); font-weight: 600; text-transform: none; letter-spacing: normal;">${formattedDate}</span>
+          </div>
+          <div>
+            <span class="badge badge-success" style="font-size: 13px; font-weight: 700; background: rgba(37, 99, 235, 0.1); color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.2);">₹${grand.toFixed(2)}</span>
+          </div>
+        </div>
+        <h4 class="mobile-card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: var(--slate-900);">${name}</h4>
+        <div class="mobile-card-details" style="font-size: 13.5px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+          <div class="detail-row">
+            <span>Phone:</span>
+            <strong>${phone}</strong>
+          </div>
+          <div class="detail-row">
+            <span>Items Sold:</span>
+            <span style="max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;" title="${items}">${items}</span>
+          </div>
+          <div class="detail-row">
+            <span>Subtotal / Tax:</span>
+            <span>₹${subtotal.toFixed(2)} / ₹${totalTax.toFixed(2)}</span>
+          </div>
+        </div>
+        <div class="mobile-card-actions" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--slate-100);">
+          <button class="btn btn-outline" style="width: 100%; border-color: var(--primary); color: var(--primary); padding: 8px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px;" onclick="viewHistoricalInvoice('${saleId}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            View Invoice
+          </button>
+        </div>
+      </div>
+    `;
   });
 
-  html += `
+  desktopHtml += `
         </tbody>
       </table>
     </div>
   `;
 
-  document.getElementById("todaySalesTable").innerHTML = html;
+  mobileHtml += `
+    </div>
+  `;
+
+  document.getElementById("todaySalesTable").innerHTML = desktopHtml + mobileHtml;
 }
 
 function searchTodaySales(keyword) {
-  const rows = document.querySelectorAll("#todaySalesTable tbody tr");
   const cleanedKeyword = keyword.toLowerCase().trim();
 
+  // Filter desktop table rows
+  const rows = document.querySelectorAll("#todaySalesTable tbody tr");
   rows.forEach(row => {
     row.style.display = row.innerText.toLowerCase().includes(cleanedKeyword) ? "" : "none";
+  });
+
+  // Filter mobile cards
+  const cards = document.querySelectorAll("#todaySalesTable .mobile-item-card");
+  cards.forEach(card => {
+    card.style.display = card.innerText.toLowerCase().includes(cleanedKeyword) ? "" : "none";
   });
 }
 
@@ -516,4 +572,13 @@ function exportSalesToCSV() {
   
   showToast("CSV report downloaded successfully!", "success");
 }
+
+document.addEventListener("sreCacheUpdated", (e) => {
+  if (e.detail.action === "sales") {
+    const salesEl = document.getElementById("sales");
+    if (salesEl && salesEl.style.display === "block") {
+      fetchSalesHistory();
+    }
+  }
+});
 
