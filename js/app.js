@@ -35,11 +35,17 @@ window.onload = () => {
   }
 };
 
+// Global navigation state tracking
+window.isNavigatingViaHistory = false;
+window.currentActivePage = "";
+
 /**
  * Handles toggling content sections under SPA main shell
  * @param {string} pageId - Target section ID (dashboard, inventory, customers, invoice)
  */
 function showPage(pageId) {
+  window.currentActivePage = pageId;
+
   document.querySelectorAll("main section").forEach(sec => {
     sec.style.display = "none";
   });
@@ -47,6 +53,22 @@ function showPage(pageId) {
   const activePage = document.getElementById(pageId);
   if (activePage) {
     activePage.style.display = "block";
+  }
+
+  // Update navigation button active state in sidebar
+  document.querySelectorAll(".sidebar button.nav-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+  const navBtn = document.getElementById("nav" + pageId.charAt(0).toUpperCase() + pageId.slice(1));
+  if (navBtn) {
+    navBtn.classList.add("active");
+  }
+
+  // Push to history ONLY if we are not navigating via history popstate
+  if (!window.isNavigatingViaHistory) {
+    if (!history.state || history.state.pageId !== pageId) {
+      history.pushState({ pageId }, "", "#" + pageId);
+    }
   }
 
   // Auto-scroll main window back to top on transitions
@@ -91,3 +113,76 @@ function toggleMobileMenu() {
     sidebar.classList.toggle("mobile-nav-open");
   }
 }
+
+// History navigation listener (browser back/forward, touchpad swiping, mouse back buttons)
+window.addEventListener("popstate", (event) => {
+  // If the invoice preview page is open, close it first and prevent navigating back
+  const invoicePreview = document.getElementById("invoiceContainer");
+  if (invoicePreview && invoicePreview.style.display === "block") {
+    if (typeof closeInvoicePreview === "function") {
+      closeInvoicePreview();
+    }
+    // Re-push current state to maintain browser history integrity
+    history.pushState({ pageId: window.currentActivePage || "dashboard" }, "", "#" + (window.currentActivePage || "dashboard"));
+    return;
+  }
+
+  if (event.state && event.state.pageId) {
+    const pageId = event.state.pageId;
+    window.isNavigatingViaHistory = true;
+    
+    switch(pageId) {
+      case "dashboard":
+        if (typeof loadDashboard === "function") loadDashboard();
+        break;
+      case "inventory":
+        if (typeof loadInventory === "function") loadInventory();
+        break;
+      case "customers":
+        if (typeof loadCustomers === "function") loadCustomers();
+        break;
+      case "invoice":
+        if (typeof loadInvoice === "function") loadInvoice();
+        break;
+      case "sales":
+        if (typeof loadSales === "function") loadSales();
+        break;
+      case "users":
+        if (typeof loadUsers === "function") loadUsers();
+        break;
+    }
+    
+    window.isNavigatingViaHistory = false;
+  }
+});
+
+// Escape key press to close modals & active overlays
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    // 1. If invoice preview is open, close it
+    const invoicePreview = document.getElementById("invoiceContainer");
+    if (invoicePreview && invoicePreview.style.display === "block") {
+      if (typeof closeInvoicePreview === "function") closeInvoicePreview();
+      return;
+    }
+
+    // 2. Check for active modal overlays
+    const activeModals = document.querySelectorAll(".modal-overlay.active");
+    if (activeModals.length > 0) {
+      activeModals.forEach(modal => {
+        const id = modal.id;
+        if (id === "productModal" && typeof closeProductModal === "function") {
+          closeProductModal();
+        } else if (id === "customerModal" && typeof closeCustomerModal === "function") {
+          closeCustomerModal();
+        } else if (id === "userModal" && typeof closeUserModal === "function") {
+          closeUserModal();
+        } else if (id === "changePasswordModal" && typeof closeChangePasswordModal === "function") {
+          closeChangePasswordModal();
+        } else {
+          modal.classList.remove("active");
+        }
+      });
+    }
+  }
+});
