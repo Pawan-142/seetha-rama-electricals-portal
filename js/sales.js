@@ -84,7 +84,7 @@ async function loadSales() {
     <!-- ===== TODAY'S TRANSACTIONS ===== -->
     <div class="card-box">
       <div class="inventory-header">
-        <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--slate-800);" id="salesTableTitle">Invoices</h2>
+        <h2 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--text-main);" id="salesTableTitle">Invoices</h2>
         <div style="display: flex; gap: 12px; align-items: center;">
           <button class="btn btn-outline" onclick="exportSalesToCSV()" style="padding: 8px 16px; font-size: 13.5px; display: inline-flex; align-items: center; gap: 8px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -311,16 +311,16 @@ function renderTodaySales(sales) {
     // Desktop row
     desktopHtml += `
       <tr>
-        <td style="font-weight: 600; color: var(--slate-600);">${formattedDate}</td>
+        <td style="font-weight: 600; color: var(--text-muted);">${formattedDate}</td>
         <td style="font-weight: 700; color: var(--primary);">${saleId}</td>
-        <td style="font-weight: 600; color: var(--slate-900);">${name}</td>
+        <td style="font-weight: 600; color: var(--text-main);">${name}</td>
         <td>${phone}</td>
         <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${items}">
           ${items}
         </td>
         <td>₹${subtotal.toFixed(2)}</td>
         <td>₹${totalTax.toFixed(2)}</td>
-        <td style="font-weight: 800; color: var(--slate-900);">₹${grand.toFixed(2)}</td>
+        <td style="font-weight: 800; color: var(--text-main);">₹${grand.toFixed(2)}</td>
         <td style="text-align: center;">
           <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12.5px; border-color: var(--primary); color: var(--primary);" onclick="viewHistoricalInvoice('${saleId}')">View Invoice</button>
         </td>
@@ -333,13 +333,13 @@ function renderTodaySales(sales) {
         <div class="mobile-card-header">
           <div>
             <span class="mobile-card-id">${saleId}</span>
-            <span class="mobile-card-category" style="color: var(--slate-500); font-weight: 600; text-transform: none; letter-spacing: normal;">${formattedDate}</span>
+            <span class="mobile-card-category" style="color: var(--text-muted); font-weight: 600; text-transform: none; letter-spacing: normal;">${formattedDate}</span>
           </div>
           <div>
             <span class="badge badge-success" style="font-size: 13px; font-weight: 700; background: rgba(37, 99, 235, 0.1); color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.2);">₹${grand.toFixed(2)}</span>
           </div>
         </div>
-        <h4 class="mobile-card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: var(--slate-900);">${name}</h4>
+        <h4 class="mobile-card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-main);">${name}</h4>
         <div class="mobile-card-details" style="font-size: 13.5px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
           <div class="detail-row">
             <span>Phone:</span>
@@ -354,7 +354,7 @@ function renderTodaySales(sales) {
             <span>₹${subtotal.toFixed(2)} / ₹${totalTax.toFixed(2)}</span>
           </div>
         </div>
-        <div class="mobile-card-actions" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--slate-100);">
+        <div class="mobile-card-actions" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
           <button class="btn btn-outline" style="width: 100%; border-color: var(--primary); color: var(--primary); padding: 8px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px;" onclick="viewHistoricalInvoice('${saleId}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             View Invoice

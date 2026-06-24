@@ -91,7 +91,7 @@ function renderUsers(users) {
     html += `
       <tr>
         <td style="font-weight: 700; color: var(--primary);">${uname}</td>
-        <td style="font-weight: 600; color: var(--slate-900);">${user.name || "N/A"}</td>
+        <td style="font-weight: 600; color: var(--text-main);">${user.name || "N/A"}</td>
         <td>
           <span class="badge ${user.role === 'admin' ? 'badge-success' : 'badge-warning'}">
             ${user.role === 'admin' ? 'Administrator' : 'Staff'}
@@ -100,7 +100,7 @@ function renderUsers(users) {
         <td style="text-align: center;">
           <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12.5px; border-color: var(--primary); color: var(--primary); margin-right: 6px;" onclick="openEditUserModal('${uname}')">Edit</button>
           ${isSelf ? `
-            <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12.5px; border-color: var(--slate-300); color: var(--slate-400); cursor: not-allowed;" title="You cannot delete yourself" disabled>Self</button>
+            <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12.5px; border-color: var(--input-border); color: var(--text-muted); cursor: not-allowed;" title="You cannot delete yourself" disabled>Self</button>
           ` : `
             <button class="btn btn-outline text-danger" style="padding: 6px 12px; font-size: 12.5px; border-color: var(--danger); color: var(--danger);" onclick="deleteUser('${uname}')">Delete</button>
           `}

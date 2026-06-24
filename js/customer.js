@@ -92,8 +92,8 @@ function renderCustomers(customers) {
     // Append to desktop table
     desktopHtml += `
       <tr data-search-text="${searchText}">
-        <td style="font-weight: 600; color: var(--slate-600);">${customer.customerId || "N/A"}</td>
-        <td style="font-weight: 600; color: var(--slate-900);">${customer.name || "Unnamed"}</td>
+        <td style="font-weight: 600; color: var(--text-muted);">${customer.customerId || "N/A"}</td>
+        <td style="font-weight: 600; color: var(--text-main);">${customer.name || "Unnamed"}</td>
         <td>${customer.phone || "N/A"}</td>
         <td style="color: var(--primary); font-weight: 500;">${customer.email || "N/A"}</td>
         <td style="font-size: 13px; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -125,7 +125,7 @@ function renderCustomers(customers) {
           </div>
           <div class="detail-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
             <span>Billing Address:</span>
-            <span style="line-height: 1.4; color: var(--slate-600);">${customer.address || "N/A"}</span>
+            <span style="line-height: 1.4; color: var(--text-muted);">${customer.address || "N/A"}</span>
           </div>
         </div>
         <div class="mobile-card-actions">

@@ -31,13 +31,21 @@
   
   /* Theme Details */
   --bg-app: #f6f9fc;
-  --bg-card: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.75);
+  --bg-card-solid: #ffffff;
+  --border-card: rgba(226, 232, 240, 0.8);
   --bg-sidebar: #0b1329;
   --sidebar-active: #1d2d50;
   --sidebar-hover: #132240;
   --text-main: #1e293b;
   --text-muted: #64748b;
   --border-color: #e2e8f0;
+
+  /* Form Inputs (Light Theme) */
+  --input-bg: var(--slate-50);
+  --input-border: var(--slate-300);
+  --input-color: var(--slate-900);
+  --input-focus-bg: #ffffff;
   
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -51,6 +59,23 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
+}
+
+/* ── Dark Theme Overrides ── */
+body.dark-theme {
+  --bg-app: #0f172a;                 /* slate-900 */
+  --bg-card: rgba(30, 41, 59, 0.75); /* slate-800 with opacity */
+  --bg-card-solid: #1e293b;          /* slate-800 */
+  --border-card: rgba(255, 255, 255, 0.08);
+  --text-main: #f1f5f9;              /* slate-100 */
+  --text-muted: #94a3b8;             /* slate-400 */
+  --border-color: #334155;           /* slate-700 */
+
+  /* Form Inputs (Dark Theme) */
+  --input-bg: var(--slate-900);
+  --input-border: var(--slate-700);
+  --input-color: #f1f5f9;
+  --input-focus-bg: var(--slate-950);
 }
 
 /* ==========================================================================
@@ -84,14 +109,14 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--slate-100);
+  background: var(--input-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--slate-300);
+  background: var(--input-border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--slate-400);
+  background: var(--text-muted);
 }
 
 /* ==========================================================================
@@ -210,24 +235,25 @@ main {
   overflow-y: auto;
   overflow-x: hidden;
   background-color: var(--bg-app);
+  position: relative;
 }
 
 .page-title {
   font-size: 28px;
   font-weight: 700;
-  color: var(--slate-900);
+  color: var(--text-main);
   margin-bottom: 24px;
   letter-spacing: -0.5px;
 }
 
 /* Glassmorphic Panel Container */
 .card-box {
-  background: rgba(255, 255, 255, 0.75);
+  background: var(--bg-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: 24px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--border-card);
   box-shadow: var(--shadow-md);
   margin-bottom: 24px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -250,12 +276,12 @@ main {
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--bg-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: 24px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--border-card);
   box-shadow: var(--shadow-md);
   display: flex;
   align-items: center;
@@ -308,7 +334,7 @@ main {
 .stat-value {
   font-size: 26px;
   font-weight: 700;
-  color: var(--slate-900);
+  color: var(--text-main);
   line-height: 1.2;
   margin-bottom: 2px;
 }
@@ -363,9 +389,9 @@ main {
 .form-control, select, textarea {
   width: 100%;
   padding: 11px 16px;
-  border: 1px solid var(--slate-300);
-  background: var(--slate-50);
-  color: var(--slate-900);
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-color);
   border-radius: var(--radius-md);
   font-size: 14px;
   font-weight: 400;
@@ -375,7 +401,7 @@ main {
 .form-control:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary);
-  background: white;
+  background: var(--input-focus-bg);
   box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
@@ -389,7 +415,7 @@ main {
 .field-group label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--slate-700);
+  color: var(--text-muted);
 }
 
 .btn {
@@ -445,12 +471,12 @@ main {
 
 .btn-outline {
   background: transparent;
-  border: 1px solid var(--slate-300);
-  color: var(--slate-700);
+  border: 1px solid var(--input-border);
+  color: var(--text-main);
 }
 .btn-outline:hover {
-  background: var(--slate-100);
-  border-color: var(--slate-400);
+  background: var(--input-bg);
+  border-color: var(--text-muted);
 }
 
 /* ==========================================================================
@@ -466,7 +492,7 @@ main {
 }
 
 .table-responsive {
-  background: white;
+  background: var(--bg-card-solid);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-md);
@@ -482,8 +508,8 @@ main {
 }
 
 .table th {
-  background: var(--slate-100);
-  color: var(--slate-700);
+  background: var(--input-bg);
+  color: var(--text-muted);
   font-weight: 600;
   padding: 14px 20px;
   border-bottom: 2px solid var(--border-color);
@@ -493,7 +519,7 @@ main {
 .table td {
   padding: 14px 20px;
   border-bottom: 1px solid var(--border-color);
-  color: var(--slate-800);
+  color: var(--text-main);
   vertical-align: middle;
 }
 
@@ -502,7 +528,7 @@ main {
 }
 
 .table tbody tr:hover {
-  background-color: var(--slate-50);
+  background-color: var(--input-bg);
 }
 
 .table tbody tr.low-stock-row {
@@ -551,7 +577,7 @@ main {
 }
 
 .modal-card {
-  background: white;
+  background: var(--bg-card-solid);
   width: 100%;
   max-width: 560px;
   border-radius: var(--radius-lg);
@@ -567,7 +593,7 @@ main {
 }
 
 .modal-header {
-  background: var(--slate-50);
+  background: var(--input-bg);
   padding: 20px 24px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
@@ -578,7 +604,7 @@ main {
 .modal-header h3 {
   font-size: 18px;
   font-weight: 700;
-  color: var(--slate-900);
+  color: var(--text-main);
 }
 
 .modal-close {
@@ -590,7 +616,7 @@ main {
 }
 
 .modal-close:hover {
-  color: var(--slate-900);
+  color: var(--text-main);
 }
 
 .modal-body {
@@ -600,7 +626,7 @@ main {
 }
 
 .modal-footer {
-  background: var(--slate-50);
+  background: var(--input-bg);
   padding: 16px 24px;
   border-top: 1px solid var(--border-color);
   display: flex;
@@ -1681,10 +1707,10 @@ main {
   .inv-table-wrap { display: none !important; }
   .inv-item-card  { 
     display: block !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: var(--bg-card) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border: 1px solid var(--border-card) !important;
     box-shadow: var(--shadow-md) !important;
     border-radius: 16px !important;
     padding: 20px !important;
@@ -1733,8 +1759,8 @@ main {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    background: linear-gradient(135deg, rgba(248, 250, 252, 0.8), rgba(241, 245, 249, 0.8)) !important;
-    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    background: var(--input-bg) !important;
+    border: 1px solid var(--border-color) !important;
     border-radius: 12px !important;
     padding: 12px 16px !important;
     margin-top: 16px !important;
@@ -1747,7 +1773,7 @@ main {
     flex: 1 !important;
   }
   .inv-card-calcs > div:not(:last-child) {
-    border-right: 1px solid rgba(226, 232, 240, 0.8) !important;
+    border-right: 1px solid var(--border-color) !important;
   }
   .inv-card-calcs span {
     font-size: 10px !important;
@@ -1758,7 +1784,7 @@ main {
   }
   .inv-card-calcs strong {
     font-size: 13px !important;
-    color: var(--slate-800) !important;
+    color: var(--text-main) !important;
     margin-top: 4px !important;
     font-weight: 700 !important;
   }
@@ -1817,11 +1843,11 @@ main {
   justify-content: space-between;
   align-items: center;
   padding: 11px 16px;
-  background: var(--slate-50);
-  border: 1px solid var(--slate-300);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: var(--radius-md);
   font-size: 14px;
-  color: var(--slate-900);
+  color: var(--input-color);
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
@@ -1833,7 +1859,7 @@ main {
   padding: 7px 10px;
   height: 34px;
   font-size: 13px;
-  background: white;
+  background: var(--input-bg);
 }
 
 .search-select-trigger:after {
@@ -1853,7 +1879,7 @@ main {
 
 .search-select-container.open .search-select-trigger {
   border-color: var(--primary);
-  background: white;
+  background: var(--input-focus-bg);
   box-shadow: 0 0 0 4px var(--primary-glow);
 }
 
@@ -1863,7 +1889,7 @@ main {
   left: 0;
   right: 0;
   z-index: 1050; /* Ensure it stays above other fields and table rows */
-  background: white;
+  background: var(--bg-card-solid);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
@@ -1892,14 +1918,14 @@ main {
   padding: 10px 14px;
   border: none;
   border-bottom: 1px solid var(--border-color);
-  background: var(--slate-50);
+  background: var(--input-bg);
   font-size: 13px;
   outline: none;
-  color: var(--slate-900);
+  color: var(--input-color);
 }
 
 .search-select-search-input:focus {
-  background: white;
+  background: var(--input-focus-bg);
 }
 
 .search-select-options {
@@ -1911,14 +1937,14 @@ main {
 .search-select-option {
   padding: 10px 14px;
   font-size: 13.5px;
-  color: var(--slate-700);
+  color: var(--text-main);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
   text-align: left;
 }
 
 .search-select-option:hover {
-  background: var(--slate-100);
+  background: var(--input-bg);
   color: var(--primary);
 }
 
@@ -1949,8 +1975,8 @@ main {
   padding: 4px 10px;
   height: 32px;
   font-size: 12.5px;
-  background: var(--bg-card);
-  color: var(--slate-800);
+  background: var(--input-bg);
+  color: var(--text-main);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   outline: none;
@@ -2125,7 +2151,7 @@ main {
 
 /* Mobile Item Card Styles */
 .mobile-item-card {
-  background: white;
+  background: var(--bg-card-solid);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 16px;
@@ -2150,15 +2176,15 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 10px;
 }
 
 .mobile-card-id {
   font-size: 11px;
   font-weight: 700;
-  background: var(--slate-100);
-  color: var(--slate-600);
+  background: var(--input-bg);
+  color: var(--text-muted);
   padding: 3px 8px;
   border-radius: var(--radius-sm);
   text-transform: uppercase;
@@ -2167,7 +2193,7 @@ main {
 .mobile-card-category {
   font-size: 11px;
   font-weight: 600;
-  color: var(--slate-400);
+  color: var(--text-muted);
   margin-left: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -2176,9 +2202,9 @@ main {
 .mobile-card-phone-badge {
   font-size: 12px;
   font-weight: 600;
-  color: var(--slate-600);
-  background: var(--slate-50);
-  border: 1px solid var(--slate-200);
+  color: var(--text-main);
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
   padding: 3px 8px;
   border-radius: var(--radius-sm);
 }
@@ -2210,7 +2236,7 @@ main {
 
 .mobile-card-details .detail-row strong,
 .mobile-card-details .detail-row span:last-child {
-  color: var(--slate-800);
+  color: var(--text-main);
 }
 
 .mobile-card-actions {
@@ -2275,4 +2301,32 @@ main {
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.4); opacity: 0.5; }
+}
+
+/* Floating theme toggle absolute positioning */
+.floating-theme-toggle-wrap {
+  position: absolute;
+  top: 36px;
+  right: 40px;
+  z-index: 100;
+}
+@media (max-width: 991px) {
+  .floating-theme-toggle-wrap {
+    top: 20px;
+    right: 20px;
+  }
+}
+@media (max-width: 600px) {
+  .floating-theme-toggle-wrap {
+    top: 14px;
+    right: 60px;
+  }
+}
+
+/* Switcher button hover animations */
+.theme-toggle-btn svg {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.theme-toggle-btn:hover svg {
+  transform: rotate(45deg) scale(1.1);
 }

@@ -1320,7 +1320,7 @@ function makeSearchableSelect(selectEl, placeholderText) {
       noResultsDiv.className = 'search-select-option no-results';
       if (selectEl.id === "customerSelect") {
         noResultsDiv.style.cursor = 'default';
-        noResultsDiv.innerHTML = `<div style="color: var(--slate-500); margin-bottom: 8px;">No matches found</div>`;
+        noResultsDiv.innerHTML = `<div style="color: var(--text-muted); margin-bottom: 8px;">No matches found</div>`;
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-primary btn-sm';
@@ -1338,7 +1338,7 @@ function makeSearchableSelect(selectEl, placeholderText) {
         noResultsDiv.appendChild(btn);
       } else if (selectEl.classList.contains("inv-sel") || selectEl.classList.contains("m-sel")) {
         noResultsDiv.style.cursor = 'default';
-        noResultsDiv.innerHTML = `<div style="color: var(--slate-500); margin-bottom: 8px;">No matches found</div>`;
+        noResultsDiv.innerHTML = `<div style="color: var(--text-muted); margin-bottom: 8px;">No matches found</div>`;
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-primary btn-sm';

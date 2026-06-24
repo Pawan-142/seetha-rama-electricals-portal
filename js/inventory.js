@@ -121,8 +121,8 @@ function renderInventory(products) {
     // Append to desktop table
     desktopHtml += `
       <tr ${trClass} data-search-text="${searchText}">
-        <td style="font-weight: 600; color: var(--slate-600);">${product.productId || "N/A"}</td>
-        <td style="font-weight: 600; color: var(--slate-900);">${product.productName || "Unnamed"}</td>
+        <td style="font-weight: 600; color: var(--text-muted);">${product.productId || "N/A"}</td>
+        <td style="font-weight: 600; color: var(--text-main);">${product.productName || "Unnamed"}</td>
         <td>${product.category || "N/A"}</td>
         <td><span class="badge ${badgeClass}">${stock}</span></td>
         <td style="font-weight: 500;">${minStock}</td>

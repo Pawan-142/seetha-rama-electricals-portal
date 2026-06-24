@@ -281,8 +281,8 @@ async function loadDashboard() {
     const salesCards = document.getElementById("recentSalesCards");
     const recent = statsRes.recentSales || [];
     if (recent.length === 0) {
-      if (salesBody) salesBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--slate-500); padding: 30px;">No sales recorded yet</td></tr>`;
-      if (salesCards) salesCards.innerHTML = `<p style="text-align: center; color: var(--slate-500); padding: 20px;">No sales recorded yet</p>`;
+      if (salesBody) salesBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;">No sales recorded yet</td></tr>`;
+      if (salesCards) salesCards.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 20px;">No sales recorded yet</p>`;
     } else {
       if (salesBody) {
         salesBody.innerHTML = recent.map(sale => `
@@ -300,15 +300,15 @@ async function loadDashboard() {
             <div class="mobile-card-header" style="border-bottom: none; padding-bottom: 0;">
               <div>
                 <span class="mobile-card-id">${sale.invoiceNo}</span>
-                <span class="mobile-card-category" style="color: var(--slate-500); text-transform: none; letter-spacing: normal; margin-left: 8px;">${sale.date}</span>
+                <span class="mobile-card-category" style="color: var(--text-muted); text-transform: none; letter-spacing: normal; margin-left: 8px;">${sale.date}</span>
               </div>
               <div>
                 <span class="badge badge-success" style="font-weight: 700; font-size: 12.5px; background: rgba(37, 99, 235, 0.1); color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.2);">₹${(Number(sale.grandTotal) || 0).toFixed(2)}</span>
               </div>
             </div>
-            <div style="font-size: 13.5px; font-weight: 600; color: var(--slate-800); padding: 0 4px; display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <div style="font-size: 13.5px; font-weight: 600; color: var(--text-main); padding: 0 4px; display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
               <span style="color: var(--text-muted);">Customer:</span>
-              <strong style="color: var(--slate-950);">${sale.customerName}</strong>
+              <strong style="color: var(--text-main);">${sale.customerName}</strong>
             </div>
           </div>
         `).join('');
@@ -331,11 +331,11 @@ async function loadDashboard() {
         const icon = isOutOfStock ? '🚨' : '⚠️';
         
         return `
-          <div class="low-stock-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255, 255, 255, 0.65); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 10px; transition: all 0.2s;">
+          <div class="low-stock-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 10px; transition: all 0.2s;">
             <div style="display: flex; align-items: center; gap: 12px;">
               <span style="font-size: 16px;">${icon}</span>
               <div>
-                <strong style="display: block; font-size: 14px; color: var(--slate-800);">${item.productName}</strong>
+                <strong style="display: block; font-size: 14px; color: var(--text-main);">${item.productName}</strong>
                 <span style="font-size: 12px; color: var(--text-muted);">${item.productId} | ₹${(Number(item.rate) || 0).toFixed(2)}</span>
               </div>
             </div>
@@ -443,12 +443,12 @@ function updateSalesChart(filterType, customStart = null, customEnd = null) {
           beginAtZero: true,
           ticks: {
             callback: function(val) { return "₹" + val.toLocaleString("en-IN"); },
-            color: "#64748b"
+            color: getChartThemeColors().tickColor
           },
-          grid: { color: "#e2e8f0" }
+          grid: { color: getChartThemeColors().gridColor }
         },
         x: {
-          ticks: { color: "#64748b" },
+          ticks: { color: getChartThemeColors().tickColor },
           grid: { display: false }
         }
       }
@@ -537,12 +537,12 @@ function updateProductsChart(filterType, customStart = null, customEnd = null) {
           beginAtZero: true,
           ticks: {
             stepSize: 1,
-            color: "#64748b"
+            color: getChartThemeColors().tickColor
           },
-          grid: { color: "#e2e8f0" }
+          grid: { color: getChartThemeColors().gridColor }
         },
         x: {
-          ticks: { color: "#64748b" },
+          ticks: { color: getChartThemeColors().tickColor },
           grid: { display: false }
         }
       }
@@ -620,7 +620,7 @@ function updateCategoryChart(filterType, customStart = null, customEnd = null) {
         data: dataPoints,
         backgroundColor: colors,
         borderWidth: 2,
-        borderColor: "#ffffff"
+        borderColor: getChartThemeColors().doughnutBorder
       }]
     },
     options: {
@@ -633,7 +633,7 @@ function updateCategoryChart(filterType, customStart = null, customEnd = null) {
           labels: {
             boxWidth: 12,
             font: { family: "Outfit", size: 12 },
-            color: "#64748b",
+            color: getChartThemeColors().tickColor,
             generateLabels: function(chart) {
               const data = chart.data;
               if (data.labels.length && data.datasets.length) {
@@ -691,3 +691,49 @@ document.addEventListener("sreCacheUpdated", (e) => {
     }
   }
 });
+
+// Theme support helpers for Chart.js
+function getChartThemeColors() {
+  const isDark = document.body.classList.contains("dark-theme");
+  return {
+    tickColor: isDark ? "#94a3b8" : "#64748b",
+    gridColor: isDark ? "#334155" : "#e2e8f0",
+    doughnutBorder: isDark ? "#1e293b" : "#ffffff"
+  };
+}
+
+function updateChartsTheme() {
+  const colors = getChartThemeColors();
+  
+  if (salesChartInstance) {
+    if (salesChartInstance.options.scales.y) {
+      if (salesChartInstance.options.scales.y.ticks) salesChartInstance.options.scales.y.ticks.color = colors.tickColor;
+      if (salesChartInstance.options.scales.y.grid) salesChartInstance.options.scales.y.grid.color = colors.gridColor;
+    }
+    if (salesChartInstance.options.scales.x && salesChartInstance.options.scales.x.ticks) {
+      salesChartInstance.options.scales.x.ticks.color = colors.tickColor;
+    }
+    salesChartInstance.update();
+  }
+  
+  if (productsChartInstance) {
+    if (productsChartInstance.options.scales.y) {
+      if (productsChartInstance.options.scales.y.ticks) productsChartInstance.options.scales.y.ticks.color = colors.tickColor;
+      if (productsChartInstance.options.scales.y.grid) productsChartInstance.options.scales.y.grid.color = colors.gridColor;
+    }
+    if (productsChartInstance.options.scales.x && productsChartInstance.options.scales.x.ticks) {
+      productsChartInstance.options.scales.x.ticks.color = colors.tickColor;
+    }
+    productsChartInstance.update();
+  }
+  
+  if (categoryChartInstance) {
+    if (categoryChartInstance.options.plugins && categoryChartInstance.options.plugins.legend && categoryChartInstance.options.plugins.legend.labels) {
+      categoryChartInstance.options.plugins.legend.labels.color = colors.tickColor;
+    }
+    if (categoryChartInstance.data.datasets && categoryChartInstance.data.datasets[0]) {
+      categoryChartInstance.data.datasets[0].borderColor = colors.doughnutBorder;
+    }
+    categoryChartInstance.update();
+  }
+}

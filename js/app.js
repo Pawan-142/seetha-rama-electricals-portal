@@ -3,6 +3,7 @@
 // ==========================================
 
 window.onload = () => {
+  initTheme();
   const userStr = localStorage.getItem("sre_user");
 
   if (userStr) {
@@ -186,3 +187,39 @@ window.addEventListener("keydown", (event) => {
     }
   }
 });
+
+// Theme Mode Toggle (Light/Dark)
+function toggleTheme() {
+  const isDark = document.body.classList.toggle("dark-theme");
+  localStorage.setItem("sre_theme", isDark ? "dark" : "light");
+  updateThemeUI(isDark);
+  if (typeof updateChartsTheme === "function") {
+    updateChartsTheme();
+  }
+}
+
+function updateThemeUI(isDark) {
+  document.querySelectorAll(".themeIconSun").forEach(el => {
+    el.style.display = isDark ? "block" : "none";
+  });
+  document.querySelectorAll(".themeIconMoon").forEach(el => {
+    el.style.display = isDark ? "none" : "block";
+  });
+  document.querySelectorAll(".themeText").forEach(el => {
+    el.textContent = isDark ? "Light Mode" : "Dark Mode";
+  });
+}
+
+// Initialize theme on load
+function initTheme() {
+  const savedTheme = localStorage.getItem("sre_theme");
+  const isDark = savedTheme === "dark";
+  if (isDark) {
+    document.body.classList.add("dark-theme");
+  } else {
+    document.body.classList.remove("dark-theme");
+  }
+  setTimeout(() => {
+    updateThemeUI(isDark);
+  }, 50); // Let DOM elements load
+}
