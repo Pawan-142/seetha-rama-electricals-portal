@@ -412,21 +412,48 @@ function closeAdjustPriceModal() {
 function updatePriceAdjustmentPreview() {
   const type = document.getElementById("adj_type").value;
   const valInput = document.getElementById("adj_value");
-  let value = parseFloat(valInput.value) || 0;
+  const rawValue = valInput.value.trim();
 
+  if (rawValue === "") {
+    document.getElementById("adj_new_rate_display").innerText = `₹${currentAdjustProductRate.toFixed(2)}`;
+    return;
+  }
+
+  // 1. Text Check
+  if (/[a-zA-Z]/.test(rawValue)) {
+    alert("It cannot accept text. Please enter a valid number.");
+    valInput.value = "";
+    document.getElementById("adj_new_rate_display").innerText = `₹${currentAdjustProductRate.toFixed(2)}`;
+    return;
+  }
+
+  let value = parseFloat(rawValue);
+  if (isNaN(value)) {
+    alert("It cannot accept text. Please enter a valid number.");
+    valInput.value = "";
+    document.getElementById("adj_new_rate_display").innerText = `₹${currentAdjustProductRate.toFixed(2)}`;
+    return;
+  }
+
+  // 2. Bound Checks
   if (type === "pct_dec" || type === "pct_inc") {
     valInput.max = 100;
     if (value > 100) {
+      alert("Percentage cannot be more than 100.");
       value = 100;
       valInput.value = 100;
+    } else if (value < 0) {
+      alert("Percentage cannot be below 0.");
+      value = 0;
+      valInput.value = 0;
     }
   } else {
     valInput.removeAttribute("max");
-  }
-
-  if (value < 0) {
-    value = 0;
-    valInput.value = 0;
+    if (value < 0) {
+      alert("Amount cannot be below 0.");
+      value = 0;
+      valInput.value = 0;
+    }
   }
 
   let newRate = currentAdjustProductRate;
@@ -455,14 +482,39 @@ async function savePriceAdjustment(event) {
   if (!product) return;
 
   const type = document.getElementById("adj_type").value;
-  let value = parseFloat(document.getElementById("adj_value").value) || 0;
-  if (value <= 0) {
-    showToast("Please enter an adjustment value greater than 0.", "error");
+  const valInput = document.getElementById("adj_value");
+  const rawValue = valInput.value.trim();
+
+  // 1. Text Check
+  if (/[a-zA-Z]/.test(rawValue)) {
+    alert("It cannot accept text. Please enter a valid number.");
+    valInput.value = "";
     return;
   }
 
-  if ((type === "pct_dec" || type === "pct_inc") && value > 100) {
-    value = 100;
+  let value = parseFloat(rawValue);
+  if (isNaN(value) || value <= 0) {
+    alert("Please enter a valid number greater than 0.");
+    return;
+  }
+
+  // 2. Bound Checks
+  if (type === "pct_dec" || type === "pct_inc") {
+    if (value > 100) {
+      alert("Percentage cannot be more than 100.");
+      value = 100;
+      valInput.value = 100;
+    } else if (value < 0) {
+      alert("Percentage cannot be below 0.");
+      value = 0;
+      valInput.value = 0;
+    }
+  } else {
+    if (value < 0) {
+      alert("Amount cannot be below 0.");
+      value = 0;
+      valInput.value = 0;
+    }
   }
 
   let newRate = currentAdjustProductRate;
@@ -530,16 +582,38 @@ function applyFormRateAdjustment() {
 
   const type = document.getElementById("p_rate_adj_type").value;
   const valInput = document.getElementById("p_rate_adj_val");
-  let val = parseFloat(valInput.value) || 0;
+  const rawValue = valInput.value.trim();
 
-  if (val <= 0) {
-    showToast("Please enter an adjustment value greater than 0.", "warning");
+  // 1. Text Check
+  if (/[a-zA-Z]/.test(rawValue)) {
+    alert("It cannot accept text. Please enter a valid number.");
+    valInput.value = "";
     return;
   }
 
-  if ((type === "pct_dec" || type === "pct_inc") && val > 100) {
-    val = 100;
-    valInput.value = 100;
+  let val = parseFloat(rawValue);
+  if (isNaN(val) || val <= 0) {
+    alert("Please enter a valid number greater than 0.");
+    return;
+  }
+
+  // 2. Bound Checks
+  if (type === "pct_dec" || type === "pct_inc") {
+    if (val > 100) {
+      alert("Percentage cannot be more than 100.");
+      val = 100;
+      valInput.value = 100;
+    } else if (val < 0) {
+      alert("Percentage cannot be below 0.");
+      val = 0;
+      valInput.value = 0;
+    }
+  } else {
+    if (val < 0) {
+      alert("Amount cannot be below 0.");
+      val = 0;
+      valInput.value = 0;
+    }
   }
 
   let newRate = currentRate;
@@ -565,18 +639,39 @@ function applyFormRateAdjustment() {
 function handleFormRateAdjValInput() {
   const type = document.getElementById("p_rate_adj_type").value;
   const valInput = document.getElementById("p_rate_adj_val");
-  let val = parseFloat(valInput.value) || 0;
+  const rawValue = valInput.value.trim();
 
+  if (rawValue === "") return;
+
+  // 1. Text Check
+  if (/[a-zA-Z]/.test(rawValue)) {
+    alert("It cannot accept text. Please enter a valid number.");
+    valInput.value = "";
+    return;
+  }
+
+  let val = parseFloat(rawValue);
+  if (isNaN(val)) {
+    alert("It cannot accept text. Please enter a valid number.");
+    valInput.value = "";
+    return;
+  }
+
+  // 2. Bound Checks
   if (type === "pct_dec" || type === "pct_inc") {
     valInput.max = 100;
     if (val > 100) {
+      alert("Percentage cannot be more than 100.");
       valInput.value = 100;
+    } else if (val < 0) {
+      alert("Percentage cannot be below 0.");
+      valInput.value = 0;
     }
   } else {
     valInput.removeAttribute("max");
-  }
-
-  if (val < 0) {
-    valInput.value = 0;
+    if (val < 0) {
+      alert("Amount cannot be below 0.");
+      valInput.value = 0;
+    }
   }
 }
