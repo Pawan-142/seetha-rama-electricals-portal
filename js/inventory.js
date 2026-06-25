@@ -412,7 +412,22 @@ function closeAdjustPriceModal() {
 function updatePriceAdjustmentPreview() {
   const type = document.getElementById("adj_type").value;
   const valInput = document.getElementById("adj_value");
-  const value = parseFloat(valInput.value) || 0;
+  let value = parseFloat(valInput.value) || 0;
+
+  if (type === "pct_dec" || type === "pct_inc") {
+    valInput.max = 100;
+    if (value > 100) {
+      value = 100;
+      valInput.value = 100;
+    }
+  } else {
+    valInput.removeAttribute("max");
+  }
+
+  if (value < 0) {
+    value = 0;
+    valInput.value = 0;
+  }
 
   let newRate = currentAdjustProductRate;
 
@@ -440,10 +455,14 @@ async function savePriceAdjustment(event) {
   if (!product) return;
 
   const type = document.getElementById("adj_type").value;
-  const value = parseFloat(document.getElementById("adj_value").value) || 0;
+  let value = parseFloat(document.getElementById("adj_value").value) || 0;
   if (value <= 0) {
     showToast("Please enter an adjustment value greater than 0.", "error");
     return;
+  }
+
+  if ((type === "pct_dec" || type === "pct_inc") && value > 100) {
+    value = 100;
   }
 
   let newRate = currentAdjustProductRate;
@@ -511,11 +530,16 @@ function applyFormRateAdjustment() {
 
   const type = document.getElementById("p_rate_adj_type").value;
   const valInput = document.getElementById("p_rate_adj_val");
-  const val = parseFloat(valInput.value) || 0;
+  let val = parseFloat(valInput.value) || 0;
 
   if (val <= 0) {
     showToast("Please enter an adjustment value greater than 0.", "warning");
     return;
+  }
+
+  if ((type === "pct_dec" || type === "pct_inc") && val > 100) {
+    val = 100;
+    valInput.value = 100;
   }
 
   let newRate = currentRate;
@@ -536,4 +560,23 @@ function applyFormRateAdjustment() {
   rateInput.value = newRate.toFixed(2);
   valInput.value = "";
   showToast(`Rate adjusted from ₹${currentRate.toFixed(2)} to ₹${newRate.toFixed(2)}!`, "success");
+}
+
+function handleFormRateAdjValInput() {
+  const type = document.getElementById("p_rate_adj_type").value;
+  const valInput = document.getElementById("p_rate_adj_val");
+  let val = parseFloat(valInput.value) || 0;
+
+  if (type === "pct_dec" || type === "pct_inc") {
+    valInput.max = 100;
+    if (val > 100) {
+      valInput.value = 100;
+    }
+  } else {
+    valInput.removeAttribute("max");
+  }
+
+  if (val < 0) {
+    valInput.value = 0;
+  }
 }
