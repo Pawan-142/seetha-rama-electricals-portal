@@ -87,7 +87,7 @@ function renderInventory(products) {
             <th>Base Rate</th>
             <th>CGST %</th>
             <th>SGST %</th>
-            ${isStaff ? '' : '<th style="text-align: center; width: 160px;">Actions</th>'}
+            ${isStaff ? '' : '<th style="text-align: center; width: 240px;">Actions</th>'}
           </tr>
         </thead>
         <tbody>
@@ -133,6 +133,10 @@ function renderInventory(products) {
         ${isStaff ? '' : `
         <td style="text-align: center;">
           <div class="table-actions">
+            <button class="btn-action btn-adjust" onclick="openAdjustPriceModal('${product.productId}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              Adjust
+            </button>
             <button class="btn-action btn-edit" onclick="openEditProductModal('${product.productId}')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path></svg>
               Edit
@@ -179,12 +183,16 @@ function renderInventory(products) {
           </div>
         </div>
         ${isStaff ? '' : `
-        <div class="mobile-card-actions">
-          <button class="btn-action btn-edit" style="flex: 1; justify-content: center;" onclick="openEditProductModal('${product.productId}')">
+        <div class="mobile-card-actions" style="flex-wrap: wrap;">
+          <button class="btn-action btn-adjust" style="flex: 1; justify-content: center; min-width: 80px;" onclick="openAdjustPriceModal('${product.productId}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            Adjust
+          </button>
+          <button class="btn-action btn-edit" style="flex: 1; justify-content: center; min-width: 80px;" onclick="openEditProductModal('${product.productId}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path></svg>
             Edit
           </button>
-          <button class="btn-action btn-delete" style="flex: 1; justify-content: center;" onclick="deleteProduct('${product.productId}')">
+          <button class="btn-action btn-delete" style="flex: 1; justify-content: center; min-width: 80px;" onclick="deleteProduct('${product.productId}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
             Delete
           </button>
@@ -373,3 +381,159 @@ document.addEventListener("sreCacheUpdated", (e) => {
     }
   }
 });
+
+// ==========================================
+// QUICK PRICE ADJUSTMENT CONTROLLERS
+// ==========================================
+
+let currentAdjustProductId = "";
+let currentAdjustProductRate = 0;
+
+function openAdjustPriceModal(productId) {
+  const product = allProducts.find(p => p.productId === productId);
+  if (!product) return;
+
+  currentAdjustProductId = productId;
+  currentAdjustProductRate = Number(product.rate) || 0;
+
+  document.getElementById("adj_p_name").value = product.productName || "";
+  document.getElementById("adj_current_rate_display").innerText = `₹${currentAdjustProductRate.toFixed(2)}`;
+  document.getElementById("adj_value").value = "";
+  document.getElementById("adj_type").value = "pct_dec";
+
+  updatePriceAdjustmentPreview();
+  document.getElementById("adjustPriceModal").classList.add("active");
+}
+
+function closeAdjustPriceModal() {
+  document.getElementById("adjustPriceModal").classList.remove("active");
+}
+
+function updatePriceAdjustmentPreview() {
+  const type = document.getElementById("adj_type").value;
+  const valInput = document.getElementById("adj_value");
+  const value = parseFloat(valInput.value) || 0;
+
+  let newRate = currentAdjustProductRate;
+
+  if (type === "pct_dec") {
+    newRate = currentAdjustProductRate * (1 - value / 100);
+  } else if (type === "pct_inc") {
+    newRate = currentAdjustProductRate * (1 + value / 100);
+  } else if (type === "amt_dec") {
+    newRate = currentAdjustProductRate - value;
+  } else if (type === "amt_inc") {
+    newRate = currentAdjustProductRate + value;
+  }
+
+  if (newRate < 0) {
+    newRate = 0;
+  }
+
+  document.getElementById("adj_new_rate_display").innerText = `₹${newRate.toFixed(2)}`;
+}
+
+async function savePriceAdjustment(event) {
+  event.preventDefault();
+
+  const product = allProducts.find(p => p.productId === currentAdjustProductId);
+  if (!product) return;
+
+  const type = document.getElementById("adj_type").value;
+  const value = parseFloat(document.getElementById("adj_value").value) || 0;
+  if (value <= 0) {
+    showToast("Please enter an adjustment value greater than 0.", "error");
+    return;
+  }
+
+  let newRate = currentAdjustProductRate;
+  if (type === "pct_dec") {
+    newRate = currentAdjustProductRate * (1 - value / 100);
+  } else if (type === "pct_inc") {
+    newRate = currentAdjustProductRate * (1 + value / 100);
+  } else if (type === "amt_dec") {
+    newRate = currentAdjustProductRate - value;
+  } else if (type === "amt_inc") {
+    newRate = currentAdjustProductRate + value;
+  }
+
+  if (newRate < 0) newRate = 0;
+
+  const submitBtn = document.getElementById("adj_submit_btn");
+  submitBtn.innerText = "Updating...";
+  submitBtn.disabled = true;
+
+  const payload = {
+    action: "editProduct",
+    productId: currentAdjustProductId,
+    productName: product.productName,
+    category: product.category,
+    unit: product.unit,
+    stock: Number(product.stock) || 0,
+    rate: Number(newRate.toFixed(2)),
+    cgst: Number(product.cgst) || 9,
+    sgst: Number(product.sgst) || 9,
+    minStock: Number(product.minStock) || 10
+  };
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showToast("Price adjusted successfully!", "success");
+      closeAdjustPriceModal();
+      invalidateCache("inventory");
+      await loadInventory();
+    } else {
+      showToast(result.message || "Failed to adjust price.", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Connection error. Could not save adjustment.", "error");
+  } finally {
+    submitBtn.innerText = "Update Price";
+    submitBtn.disabled = false;
+  }
+}
+
+function applyFormRateAdjustment() {
+  const rateInput = document.getElementById("p_rate");
+  const currentRate = parseFloat(rateInput.value) || 0;
+  if (currentRate <= 0) {
+    showToast("Please enter a valid base rate first before adjusting.", "warning");
+    return;
+  }
+
+  const type = document.getElementById("p_rate_adj_type").value;
+  const valInput = document.getElementById("p_rate_adj_val");
+  const val = parseFloat(valInput.value) || 0;
+
+  if (val <= 0) {
+    showToast("Please enter an adjustment value greater than 0.", "warning");
+    return;
+  }
+
+  let newRate = currentRate;
+  if (type === "pct_dec") {
+    newRate = currentRate * (1 - val / 100);
+  } else if (type === "pct_inc") {
+    newRate = currentRate * (1 + val / 100);
+  } else if (type === "amt_dec") {
+    newRate = currentRate - val;
+  } else if (type === "amt_inc") {
+    newRate = currentRate + val;
+  }
+
+  if (newRate < 0) {
+    newRate = 0;
+  }
+
+  rateInput.value = newRate.toFixed(2);
+  valInput.value = "";
+  showToast(`Rate adjusted from ₹${currentRate.toFixed(2)} to ₹${newRate.toFixed(2)}!`, "success");
+}

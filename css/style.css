@@ -2359,7 +2359,7 @@ main {
   gap: 8px;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap; /* wraps with a clean gap on narrow viewports */
+  flex-wrap: nowrap;
   width: 100%;
 }
 
@@ -2425,6 +2425,25 @@ main {
 }
 
 .btn-action.btn-delete:active {
+  transform: translateY(1px);
+}
+
+/* Adjust action button style */
+.btn-action.btn-adjust {
+  color: var(--warning);
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.btn-action.btn-adjust:hover {
+  background: var(--warning);
+  border-color: var(--warning);
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.15);
+}
+
+.btn-action.btn-adjust:active {
   transform: translateY(1px);
 }
 

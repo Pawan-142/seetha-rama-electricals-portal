@@ -178,6 +178,8 @@ window.addEventListener("keydown", (event) => {
           closeCustomerModal();
         } else if (id === "userModal" && typeof closeUserModal === "function") {
           closeUserModal();
+        } else if (id === "adjustPriceModal" && typeof closeAdjustPriceModal === "function") {
+          closeAdjustPriceModal();
         } else if (id === "changePasswordModal" && typeof closeChangePasswordModal === "function") {
           closeChangePasswordModal();
         } else {
